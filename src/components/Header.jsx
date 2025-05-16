@@ -1,13 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import MainBanner from "./MainBanner";
-const Header = ({ onSearch }) => {
-  const [searchText, setSearchText] = useState("");
-  // 타이핑 시 바로 검색 시작.
-  useEffect(() => {
-    onSearch(searchText);
-  }, [searchText, onSearch]);
-
+const Header = ({ searchText, setSearchText }) => {
   return (
     <header>
       {/* 좌측 로고 */}
