@@ -17,6 +17,7 @@ const mockData = [
     desc: "짜장, 짬뽕, 탕수육 전문",
   },
   { id: 6, name: "내내치킨", category: "한식", desc: "중독적인 스노윙치킨" },
+  { id: 7, name: "맘스터치", category: "한식", desc: "중독적인 스노윙치킨" },
 ];
 //실행 확인을 위한 더미 데이터
 
