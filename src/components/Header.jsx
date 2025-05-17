@@ -1,6 +1,12 @@
+import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import MainBanner from "./MainBanner";
-const Header = ({ inputText, setInputText, setSearchText }) => {
+const Header = ({
+  inputText,
+  setInputText,
+  setSearchText,
+  resetAllFilters,
+}) => {
   /** input 테그에 타이핑 시 바로 타이핑 된 값이 렌더링됩니다 */
   const onChangeContent = (e) => {
     setInputText(e.target.value);
@@ -15,7 +21,9 @@ const Header = ({ inputText, setInputText, setSearchText }) => {
   return (
     <header>
       {/* 좌측 로고 */}
-      <div>페이지로고</div>
+      <Link to="/" onClick={resetAllFilters}>
+        페이지로고
+      </Link>
       {/* 중앙 검색창 */}
       <div>
         <input

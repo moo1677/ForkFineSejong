@@ -15,12 +15,19 @@ function App() {
   const [searchText, setSearchText] = useState("");
   /** 검색창의 검색어를 바꾸는 useState */
   const [inputText, setInputText] = useState("");
+  /** 페이지의 상태를 모두 초기화 하는 함수 */
+  const resetAllFilters = () => {
+    setSelectedCategory("전체");
+    setSearchText("");
+    setInputText("");
+  };
   return (
     <>
       <Header
         inputText={inputText}
         setInputText={setInputText}
         setSearchText={setSearchText}
+        resetAllFilters={resetAllFilters}
       />
       <Routes>
         <Route
