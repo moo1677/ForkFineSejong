@@ -4,6 +4,7 @@ import Header from "./components/Header.jsx";
 import CategoryFilter from "./components/CategoryFilter.jsx";
 import RestaurantDetail from "./components/RestaurantDetail.jsx";
 import RestaurantList from "./components/RestaurantList.jsx";
+import KakaoMap from "./components/KakaoMap.jsx";
 import { Routes, Route } from "react-router-dom";
 
 // 1. "/" 메인 홈 페이지
@@ -45,7 +46,15 @@ function App() {
             </>
           }
         />
-        <Route path="/restaurant/:name" element={<RestaurantDetail />} />
+        <Route
+          path="/restaurant/:name"
+          element={
+            <>
+              <RestaurantDetail />
+              <KakaoMap />
+            </>
+          }
+        />
       </Routes>
     </>
   );
