@@ -11,14 +11,18 @@ import { Routes, Route } from "react-router-dom";
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchText, setSearchText] = useState("");
-
-  useEffect(() => {
-    console.log("검색어:", searchText);
-  }, [searchText]);
+  const [inputText, setInputText] = useState("");
+  // useEffect(() => {
+  //   console.log("검색어:", searchText);
+  // }, [searchText]);
 
   return (
     <>
-      <Header searchText={searchText} setSearchText={setSearchText} />
+      <Header
+        inputText={inputText}
+        setInputText={setInputText}
+        setSearchText={setSearchText}
+      />
       <Routes>
         <Route
           path="/"

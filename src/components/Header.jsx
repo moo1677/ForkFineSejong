@@ -1,7 +1,17 @@
 import { useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import MainBanner from "./MainBanner";
-const Header = ({ searchText, setSearchText }) => {
+const Header = ({ inputText, setInputText, setSearchText }) => {
+  const onChangeContent = (e) => {
+    setInputText(e.target.value);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.keyCode === 13) {
+      setSearchText(inputText);
+    }
+  };
+
   return (
     <header>
       {/* 좌측 로고 */}
@@ -11,8 +21,9 @@ const Header = ({ searchText, setSearchText }) => {
         <input
           type="text"
           placeholder="음식점 이름 입력"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          value={inputText}
+          onChange={onChangeContent}
+          onKeyDown={onKeyDown}
         />
         {/* 돋보기 아이콘 */}
         <CiSearch />
