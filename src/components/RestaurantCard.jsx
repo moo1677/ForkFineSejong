@@ -4,7 +4,7 @@ const RestaurantCard = ({ restaurant }) => {
   return (
     <div
       className="restaurantCard"
-      onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+      onClick={() => navigate(`/restaurant/${restaurant.name}`)}
       style={{ cursor: "pointer" }}
     >
       <img src />
