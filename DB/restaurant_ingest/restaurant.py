@@ -7,7 +7,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 
 
-
 API_KEY = "6ac973f6f1586ff7c12f5f87f7cd28e6"
 headers = {"Authorization": f"KakaoAK {API_KEY}"}
 
@@ -16,7 +15,7 @@ conn = pymysql.connect(
     host='localhost',
     user='root',
     password='5242',
-    db='new_rest',
+    db='FFS',
     charset='utf8mb4'
 )
 cursor = conn.cursor()
@@ -35,7 +34,7 @@ categories = {
 }
 
 url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-n = 5  # 카테고리별 최대 수
+n = 2  # 카테고리별 최대 수
 
 for category, keyword in categories.items():
     collected = 0
@@ -87,7 +86,8 @@ for category, keyword in categories.items():
 
                 # 이미지
                 try:
-                    main_img = driver.find_element(By.CSS_SELECTOR, 'div.board_photo.only_pc div.inner_board div.col a.link_photo img')
+                    main_img = driver.find_element(
+                        By.CSS_SELECTOR, 'div.board_photo.only_pc div.inner_board div.col a.link_photo img')
                     main_image_url = main_img.get_attribute('src')
                 except NoSuchElementException:
                     main_image_url = None

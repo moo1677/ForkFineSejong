@@ -14,7 +14,7 @@ conn = pymysql.connect(
     host='localhost',
     user='root',
     password='5242',
-    db='new_rest',
+    db='FFS',
     charset='utf8mb4'
 )
 cursor = conn.cursor()
