@@ -1,0 +1,42 @@
+/* .filter-section {
+  padding: 1rem 2rem;
+}
+.filter-section h2 {
+  margin: 0 0 0.5rem;
+} */
+.filters {
+  padding-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+.filter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 1.5rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.filter-btn:hover {
+  background: #f0f0f0;
+}
+.filter-btn.active {
+  background-color: #f0f0f0; /* 원하시는 회색으로 조정 */
+  color: #000; /* 글자는 검은색 유지 */
+  border-color: #ccc; /* 기본 테두리 색(원래대로) */
+}
+
+/* .filter-icon {
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.filter-label {
+  font-size: 1rem;
+} */

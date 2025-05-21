@@ -1,0 +1,89 @@
+.app-header {
+  position: fixed; /* ✅ 스크롤과 관계없이 위치 고정 */
+  top: 0; /* 상단에 딱 붙게 */
+  left: 0;
+  width: 100%; /* 화면 너비 전체 차지 */
+  z-index: 1000; /* 다른 요소보다 위에 있도록 */
+  background: #fdfbee; /* 배경색 유지 (투명하면 겹쳐 보임) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+}
+
+/* 내부 컨테이너 */
+.header-inner {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 좌우 여백 고정 방지 */
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+/* 왼쪽 로고/브랜드 */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-left: 0.5rem;
+}
+.logo {
+  width: 30px;
+  height: 30px;
+}
+.brand {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* 검색창 영역 */
+.header-center {
+  flex: 1; /* 남은 공간을 모두 차지 */
+  display: flex;
+  justify-content: center;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 200px;
+  max-width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding-right: 0.75rem;
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  width: 100%;
+  padding: 0.4rem;
+  background: transition;
+  font-size: 1rem;
+  margin-left: 1rem;
+  line-height: 1.25rem;
+}
+.search-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+}
+.search-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #333;
+}
+
+/* 오른쪽 메뉴 */
+.header-nav {
+  display: flex;
+  align-items: center;
+  color: #333;
+  padding-right: 0.5rem;
+}

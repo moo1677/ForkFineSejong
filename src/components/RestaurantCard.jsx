@@ -1,3 +1,4 @@
+import "./RestaurantCard.css";
 import { useNavigate } from "react-router-dom";
 
 const RestaurantCard = ({ restaurant }) => {
@@ -9,15 +10,16 @@ const RestaurantCard = ({ restaurant }) => {
   };
 
   return (
-    <div
-      className="restaurantCard"
-      onClick={handleClick}
-      //style={{ cursor: "pointer", border: "1px solid #ccc", padding: "1rem", margin: "1rem" }}
-    >
-      <img src />
-      <h3>{restaurant.name}</h3>
-      <p>{restaurant.desc}</p>
-    </div>
+    <button className="card" onClick={handleClick}>
+      <img className="card-img" src />
+      <h3 className="card-title">
+        {restaurant.name}
+        {restaurant.rating && (
+          <span className="card-rating">⭐ {restaurant.rating}</span>
+        )}
+      </h3>
+      <p className="card-desc">{restaurant.desc}</p>
+    </button>
   );
 };
 
