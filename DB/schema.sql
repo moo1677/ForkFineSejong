@@ -9,7 +9,8 @@
 --   open_time VARCHAR(100) NOT NULL,                      -- 영업시간 (예: 11:00~21:30)
 --   main_image_url VARCHAR(255),                          -- 대표 이미지 URL (없으면 NULL)
 --   kakao_id VARCHAR(50) NOT NULL UNIQUE,                 -- Kakao 고유 장소 ID (중복 방지 키)
---   kakao_url VARCHAR(255) NOT NULL                       -- Kakao 상세 페이지 URL
+--   kakao_url VARCHAR(255) NOT NULL,                       -- Kakao 상세 페이지 URL
+--   rating DECIMAL(2,1) DEFAULT 0.0                        -- 별점 정보 0.0
 -- );
 
 /*
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS restaurant (
   main_image_url VARCHAR(255),
   kakao_id VARCHAR(50) NOT NULL UNIQUE,
   kakao_url VARCHAR(255) NOT NULL
+  rating DECIMAL(2,1) DEFAULT 0.0
 );
 */
 

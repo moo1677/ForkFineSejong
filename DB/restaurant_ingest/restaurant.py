@@ -34,7 +34,7 @@ categories = {
 }
 
 url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-n = 2  # 카테고리별 최대 수
+n = 10  # 카테고리별 최대 수
 
 for category, keyword in categories.items():
     collected = 0
@@ -66,8 +66,23 @@ for category, keyword in categories.items():
                     continue  # 다음 음식점으로 넘어감
 
                 kakao_url = f"https://place.map.kakao.com/{kakao_id}"
-                driver.get(kakao_url.replace("place.map.kakao.com", "place.map.kakao.com/m"))
+                # driver.get(kakao_url.replace("place.map.kakao.com", "place.map.kakao.com/m"))
+                driver.get(kakao_url)
                 time.sleep(2)
+
+                # 별점
+                rating = None
+                try:
+                    rating_element = driver.find_element(By.CSS_SELECTOR, 'span.starred_grade > span.num_star')
+                    rating_text = rating_element.text.strip()
+                    rating = float(rating_text) if rating_text and rating_text.replace('.', '', 1).isdigit() else None
+                except Exception as e:
+                    print(f"[DEBUG] 별점 파싱 실패: {e}")
+                    rating = None
+                # 별점 필터링: 3.5 미만은 제외
+                if rating is not None and rating < 3.5:
+                    print(f"⚠️ {doc['place_name']} 별점 {rating}점으로 제외됨")
+                    continue
 
                 # 오픈 시간
                 open_time = None
@@ -102,8 +117,8 @@ for category, keyword in categories.items():
                 cursor.execute("""
                     INSERT IGNORE INTO restaurant (
                         name, category, description, address, phone, open_time,
-                        main_image_url, kakao_id, kakao_url
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        main_image_url, kakao_id, kakao_url, rating
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     doc['place_name'],
                     category,  # 상위 카테고리로 고정
@@ -113,7 +128,8 @@ for category, keyword in categories.items():
                     open_time,
                     main_image_url,
                     kakao_id,
-                    kakao_url
+                    kakao_url,
+                    rating
                 ))
                 conn.commit()
                 collected += 1
