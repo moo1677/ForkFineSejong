@@ -1,6 +1,7 @@
 import "./RestaurantDetail.css";
 import KakaoMap from "./KakaoMap.jsx";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 const RestaurantDetail = ({ restaurants }) => {
   const { name } = useParams();
@@ -8,10 +9,14 @@ const RestaurantDetail = ({ restaurants }) => {
   // name과 정확히 일치하는 음식점 찾기
   const restaurant = restaurants.find((r) => r.name === name);
 
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [visibleCountReview, setVisibleCountReview] = useState(5);
   if (!restaurant) {
     return <div>음식점 정보를 찾을 수 없습니다.</div>;
   }
-
+  //리뷰를 visibleCount만큼 자르기,
+  const reviewsToShow = restaurant.reviews?.slice(0, visibleCountReview) || [];
+  const menuToShow = restaurant.menu?.slice(0, visibleCount) || [];
   return (
     <>
       <div className="app">
@@ -29,8 +34,8 @@ const RestaurantDetail = ({ restaurants }) => {
         {/* 메뉴판 */}
         <div className="menu-board">
           <h3>메뉴</h3>
-          {restaurant.menu && restaurant.menu.length > 0 ? (
-            restaurant.menu.map((item, index) => (
+          {menuToShow.length > 0 ? (
+            menuToShow.map((item, index) => (
               <div key={index} className="menu-item">
                 <img
                   src={item.image}
@@ -49,13 +54,24 @@ const RestaurantDetail = ({ restaurants }) => {
           ) : (
             <p>등록된 메뉴가 없습니다.</p>
           )}
+
+          {restaurant.menu?.length > visibleCount && (
+            <div className="load-more-section.menu-load-more">
+              <button
+                className="load-more-btn"
+                onClick={() => setVisibleCount((prev) => prev + 3)}
+              >
+                메뉴 더보기
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 리뷰 섹션 */}
         <div className="review-section">
           <h3>리뷰</h3>
-          {restaurant.reviews && restaurant.reviews.length > 0 ? (
-            restaurant.reviews.map((review, index) => (
+          {reviewsToShow.length > 0 ? (
+            reviewsToShow.map((review, index) => (
               <div key={index} className="review-card">
                 <p>
                   <strong>{review.user}</strong> - {review.comment}
@@ -64,6 +80,18 @@ const RestaurantDetail = ({ restaurants }) => {
             ))
           ) : (
             <p>아직 리뷰가 없습니다.</p>
+          )}
+
+          {/* ✅ 리뷰 더보기 버튼 조건도 null-safe하게 수정 */}
+          {restaurant.reviews?.length > visibleCountReview && (
+            <div className="load-more-section review-load-more">
+              <button
+                className="load-more-btn"
+                onClick={() => setVisibleCountReview((prev) => prev + 5)}
+              >
+                리뷰 더보기
+              </button>
+            </div>
           )}
           <KakaoMap />
         </div>
