@@ -93,7 +93,7 @@ const RestaurantDetail = ({ restaurants }) => {
               </button>
             </div>
           )}
-          <KakaoMap />
+          <KakaoMap address={restaurant.address} />
         </div>
       </div>
       {/* 푸터 */}

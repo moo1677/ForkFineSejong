@@ -97,6 +97,7 @@ function App() {
           { user: "철수", comment: "맛있어요!" },
           { user: "영희", comment: "조금 짜요" },
         ],
+        address: "서울특별시 광진구 능동로 209",
       },
       {
         id: 2,
