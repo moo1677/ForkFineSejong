@@ -1,7 +1,6 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
-import MainBanner from "./MainBanner";
 const Header = ({
   inputText,
   setInputText,
@@ -52,8 +51,6 @@ const Header = ({
           <nav className="header-nav">메뉴</nav>
         </div>
       </header>
-
-      <MainBanner />
     </>
   );
 };

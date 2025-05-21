@@ -1,10 +1,10 @@
 .app-header {
-  position: fixed; /* ✅ 스크롤과 관계없이 위치 고정 */
-  top: 0; /* 상단에 딱 붙게 */
+  position: fixed;
+  top: 0;
   left: 0;
   width: 100%; /* 화면 너비 전체 차지 */
   z-index: 1000; /* 다른 요소보다 위에 있도록 */
-  background: #fdfbee; /* 배경색 유지 (투명하면 겹쳐 보임) */
+  background: #fdfbee;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
 }

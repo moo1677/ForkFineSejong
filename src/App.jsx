@@ -4,7 +4,8 @@ import Header from "./components/Header.jsx";
 import CategoryFilter from "./components/CategoryFilter.jsx";
 import RestaurantDetail from "./components/RestaurantDetail.jsx";
 import RestaurantList from "./components/RestaurantList.jsx";
-import KakaoMap from "./components/KakaoMap.jsx";
+import MainBanner from "./components/MainBanner";
+
 import { Routes, Route } from "react-router-dom";
 // 1. "/" 메인 홈 페이지
 // 2. "/Card" 음식점 상세 페이지
@@ -45,6 +46,19 @@ function App() {
         desc: "맛있는 버거와 후라이드치킨",
         image: "https://via.placeholder.com/150", // 임시 이미지
         rating: 4.3,
+        menu: [
+          {
+            name: "싸이순살버거",
+            price: 4500,
+            desc: "대표 메뉴",
+            image: "...",
+          },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+        ],
+        reviews: [
+          { user: "철수", comment: "맛있어요!" },
+          { user: "영희", comment: "조금 짜요" },
+        ],
       },
       {
         id: 2,
@@ -176,6 +190,7 @@ function App() {
           path="/"
           element={
             <>
+              <MainBanner />
               <CategoryFilter
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
@@ -193,7 +208,6 @@ function App() {
           element={
             <>
               <RestaurantDetail restaurants={restaurantData} />
-              <KakaoMap />
             </>
           }
         />
