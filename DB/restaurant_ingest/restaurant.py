@@ -1,12 +1,11 @@
 import time
 import pymysql
 import requests
+import math
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
-import math
-
 
 API_KEY = "6ac973f6f1586ff7c12f5f87f7cd28e6"
 headers = {"Authorization": f"KakaoAK {API_KEY}"}
@@ -35,36 +34,30 @@ categories = {
 }
 
 url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-n = 1  # 카테고리별 최대 수
+n = 1
 
-# 정문/후문 태그 저장 함수
-import math
+# ✅ 정문/후문 기준 좌표 상수화
+MAIN_GATE = (37.549048, 127.075217)
+BACK_GATE = (37.552936, 127.072474)
+DIST_STD = 400  # 미터
 
-def get_location_tag(y, x):
+# ✅ 위치 판별 함수
+def get_location_tag(lat, lon):
     def haversine(lat1, lon1, lat2, lon2):
-        R = 6371e3  # 지구 반지름 (미터)
-        phi1 = math.radians(lat1)
-        phi2 = math.radians(lat2)
+        R = 6371e3
+        phi1, phi2 = math.radians(lat1), math.radians(lat2)
         dphi = math.radians(lat2 - lat1)
         dlambda = math.radians(lon2 - lon1)
-        a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c
+        a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+        return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-    # 기준 좌표
-    main_gate = (37.549048, 127.075217)
-    back_gate = (37.552936, 127.072474)
-    dist_std = 400
-
-    dist_main = haversine(y, x, *main_gate)
-    dist_back = haversine(y, x, *back_gate)
-
-    if dist_main <= dist_std:
+    dist_main = haversine(lat, lon, *MAIN_GATE)
+    dist_back = haversine(lat, lon, *BACK_GATE)
+    if dist_main <= DIST_STD:
         return "정문"
-    elif dist_back <= dist_std:
+    elif dist_back <= DIST_STD:
         return "후문"
-    else:
-        return "기타"
+    return "기타"
 
 for category, keyword in categories.items():
     collected = 0
@@ -87,35 +80,69 @@ for category, keyword in categories.items():
         for doc in documents:
             try:
                 kakao_id = doc['id']
-                # 중복 여부 확인
-                cursor.execute("SELECT COUNT(*) FROM restaurant WHERE kakao_id = %s", (kakao_id,))
-                exists = cursor.fetchone()[0]
+                cursor.execute("SELECT rating, location_tag FROM restaurant WHERE kakao_id = %s", (kakao_id,))
+                existing = cursor.fetchone()
 
-                if exists:
-                    print(f"⚠️ {doc['place_name']} 이미 존재함, 건너뜀")
-                    continue  # 다음 음식점으로 넘어감
+                if existing:
+                    update_fields, update_values = [], []
 
-                kakao_url = f"https://place.map.kakao.com/{kakao_id}"
-                # driver.get(kakao_url.replace("place.map.kakao.com", "place.map.kakao.com/m"))
-                driver.get(kakao_url)
+                    # 위치 정보 계산 (X,Y는 항상 필요)
+                    x = float(doc['x'])
+                    y = float(doc['y'])
+                    location_tag = get_location_tag(y, x)
+
+                    # rating/location_tag 확인 후 필요한 경우에만 파싱 수행
+                    update_required = False
+                    if existing[0] == 0.0 or (existing[1] == '기타' and location_tag != '기타'):
+                        driver.get(f"https://place.map.kakao.com/{kakao_id}")
+                        time.sleep(2)
+
+                        if existing[0] == 0.0:
+                            try:
+                                rating_elem = driver.find_element(By.CSS_SELECTOR, 'span.starred_grade > span.num_star')
+                                rating_text = rating_elem.text.strip()
+                                rating = float(rating_text) if rating_text.replace('.', '', 1).isdigit() else None
+                                if rating is not None:
+                                    update_fields.append("rating = %s")
+                                    update_values.append(rating)
+                                    update_required = True
+                            except Exception as e:
+                                print(f"[DEBUG] 별점 파싱 실패: {e}")
+
+                        if existing[1] == '기타' and location_tag != '기타':
+                            update_fields.append("location_tag = %s")
+                            update_values.append(location_tag)
+                            update_required = True
+
+                        if update_required:
+                            update_values.append(kakao_id)
+                            cursor.execute(f"""
+                                UPDATE restaurant SET {', '.join(update_fields)}
+                                WHERE kakao_id = %s
+                            """, tuple(update_values))
+                            conn.commit()
+                            print(f"🔄 {doc['place_name']} 정보 업데이트 완료")
+                        else:
+                            print(f"⚠️ {doc['place_name']} 이미 존재함, 건너뜀")
+                    else:
+                        print(f"⚠️ {doc['place_name']} 이미 존재함, 건너뜀")
+                    continue
+
+                # 신규 음식점 전체 정보 수집
+                driver.get(f"https://place.map.kakao.com/{kakao_id}")
                 time.sleep(2)
 
-                # 별점
-                rating = None
                 try:
-                    rating_element = driver.find_element(By.CSS_SELECTOR, 'span.starred_grade > span.num_star')
-                    rating_text = rating_element.text.strip()
-                    rating = float(rating_text) if rating_text and rating_text.replace('.', '', 1).isdigit() else None
-                except Exception as e:
-                    print(f"[DEBUG] 별점 파싱 실패: {e}")
+                    rating_elem = driver.find_element(By.CSS_SELECTOR, 'span.starred_grade > span.num_star')
+                    rating_text = rating_elem.text.strip()
+                    rating = float(rating_text) if rating_text.replace('.', '', 1).isdigit() else None
+                except:
                     rating = None
-                
-                # 별점 필터링: 3.5 미만은 제외
+
                 if rating is not None and rating < 3.5:
                     print(f"⚠️ {doc['place_name']} 별점 {rating}점으로 제외됨")
                     continue
 
-                # 오픈 시간
                 open_time = None
                 try:
                     btn = driver.find_element(By.CSS_SELECTOR, 'button[aria-controls="foldDetail2"]')
@@ -130,7 +157,6 @@ for category, keyword in categories.items():
                 except:
                     pass
 
-                # 이미지
                 try:
                     main_img = driver.find_element(
                         By.CSS_SELECTOR, 'div.board_photo.only_pc div.inner_board div.col a.link_photo img')
@@ -138,14 +164,12 @@ for category, keyword in categories.items():
                 except NoSuchElementException:
                     main_image_url = None
 
-                # 주소와 전화번호
                 address = doc.get('road_address_name') or doc.get('address_name')
                 phone = doc.get('phone')
 
                 if not all([doc['place_name'], address, phone, main_image_url]):
-                    continue  # 필수 값 누락 시 건너뜀
+                    continue
 
-                # 정문/후문 정보 저장(기본값 기타)
                 x = float(doc['x'])
                 y = float(doc['y'])
                 location_tag = get_location_tag(y, x)
@@ -156,18 +180,9 @@ for category, keyword in categories.items():
                         main_image_url, kakao_id, kakao_url, rating, location_tag, is_new
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
-                    doc['place_name'],
-                    category,
-                    None,
-                    address,
-                    phone,
-                    open_time,
-                    main_image_url,
-                    kakao_id,
-                    kakao_url,
-                    rating,
-                    location_tag,
-                    False
+                    doc['place_name'], category, None, address, phone, open_time,
+                    main_image_url, kakao_id, f"https://place.map.kakao.com/{kakao_id}",
+                    rating, location_tag, False
                 ))
                 conn.commit()
                 collected += 1
@@ -181,6 +196,5 @@ for category, keyword in categories.items():
 
         page += 1
 
-# 종료
 driver.quit()
 conn.close()
