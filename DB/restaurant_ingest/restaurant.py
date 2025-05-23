@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
+import math
 
 
 API_KEY = "6ac973f6f1586ff7c12f5f87f7cd28e6"
@@ -34,7 +35,36 @@ categories = {
 }
 
 url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-n = 10  # 카테고리별 최대 수
+n = 1  # 카테고리별 최대 수
+
+# 정문/후문 태그 저장 함수
+import math
+
+def get_location_tag(y, x):
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371e3  # 지구 반지름 (미터)
+        phi1 = math.radians(lat1)
+        phi2 = math.radians(lat2)
+        dphi = math.radians(lat2 - lat1)
+        dlambda = math.radians(lon2 - lon1)
+        a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
+
+    # 기준 좌표
+    main_gate = (37.549048, 127.075217)
+    back_gate = (37.552936, 127.072474)
+    dist_std = 400
+
+    dist_main = haversine(y, x, *main_gate)
+    dist_back = haversine(y, x, *back_gate)
+
+    if dist_main <= dist_std:
+        return "정문"
+    elif dist_back <= dist_std:
+        return "후문"
+    else:
+        return "기타"
 
 for category, keyword in categories.items():
     collected = 0
@@ -79,6 +109,7 @@ for category, keyword in categories.items():
                 except Exception as e:
                     print(f"[DEBUG] 별점 파싱 실패: {e}")
                     rating = None
+                
                 # 별점 필터링: 3.5 미만은 제외
                 if rating is not None and rating < 3.5:
                     print(f"⚠️ {doc['place_name']} 별점 {rating}점으로 제외됨")
@@ -114,14 +145,19 @@ for category, keyword in categories.items():
                 if not all([doc['place_name'], address, phone, main_image_url]):
                     continue  # 필수 값 누락 시 건너뜀
 
+                # 정문/후문 정보 저장(기본값 기타)
+                x = float(doc['x'])
+                y = float(doc['y'])
+                location_tag = get_location_tag(y, x)
+
                 cursor.execute("""
                     INSERT IGNORE INTO restaurant (
                         name, category, description, address, phone, open_time,
-                        main_image_url, kakao_id, kakao_url, rating
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        main_image_url, kakao_id, kakao_url, rating, location_tag, is_new
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     doc['place_name'],
-                    category,  # 상위 카테고리로 고정
+                    category,
                     None,
                     address,
                     phone,
@@ -129,7 +165,9 @@ for category, keyword in categories.items():
                     main_image_url,
                     kakao_id,
                     kakao_url,
-                    rating
+                    rating,
+                    location_tag,
+                    False
                 ))
                 conn.commit()
                 collected += 1
