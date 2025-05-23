@@ -1,0 +1,77 @@
+.pick-wrapper {
+  padding: 1em;
+  max-width: 800px;
+  margin: auto;
+}
+
+.pick-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+.pick-title span {
+  color: gray;
+  font-weight: normal;
+}
+
+.slider-container {
+  position: relative;
+}
+.slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 0 1rem 1.5rem 1rem;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.slider::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  min-width: 160px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.card-img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.card-title {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 14px;
+}
+.card-info {
+  font-size: 12px;
+  color: #666;
+}
+.arrow-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 56px;
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+.arrow-button.left {
+  left: 0;
+}
+.arrow-button.right {
+  right: 0;
+}
