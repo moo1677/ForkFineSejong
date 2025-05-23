@@ -3,100 +3,122 @@ import pymysql
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from datetime import datetime
 
-# -----------------------------
 # DB 연결
-# -----------------------------
 conn = pymysql.connect(
     host='localhost',
     user='root',
     password='5242',
-    db='new_rest',
+    db='FFS',
     charset='utf8mb4'
 )
 cursor = conn.cursor()
 
-# -----------------------------
 # Selenium 설정
-# -----------------------------
 options = Options()
-# options.add_argument('--headless')  # 필요 시 사용
+options.add_argument('--headless')
 options.add_argument('--disable-gpu')
 driver = webdriver.Chrome(options=options)
+wait = WebDriverWait(driver, 10)
 
-# -----------------------------
-# restaurant 테이블에서 kakao_id와 id 가져오기
-# -----------------------------
-cursor.execute("SELECT id, kakao_id FROM restaurant")
+# DB에서 음식점 목록 가져오기 (id 순 정렬)
+cursor.execute("SELECT id, kakao_id FROM restaurant ORDER BY id ASC")
 restaurants = cursor.fetchall()
 
-# -----------------------------
-# 각 음식점에 대해 리뷰 수집
-# -----------------------------
 for restaurant_id, kakao_id in restaurants:
+    # ✅ 기존 리뷰가 존재하면 건너뜀
+    cursor.execute("SELECT COUNT(*) FROM review WHERE restaurant_id = %s", (restaurant_id,))
+    if cursor.fetchone()[0] > 0:
+        print(f"⏩ 리뷰 이미 존재함 (restaurant_id={restaurant_id})")
+        continue
+
     try:
         url = f"https://place.map.kakao.com/{kakao_id}"
         driver.get(url)
-        time.sleep(3)
+        time.sleep(2)
 
         # 후기 탭 클릭
         try:
-            review_tab = driver.find_element(By.XPATH, "//a[contains(text(), '후기')]")
-            driver.execute_script("arguments[0].click();", review_tab)
-            time.sleep(2)
-        except NoSuchElementException:
-            print(f"{kakao_id} - 후기 탭 없음")
+            review_tab = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, 'a.link_tab[href="#comment"]'))
+            )
+            review_tab.click()
+            time.sleep(1.5)
+        except:
             continue
 
-        # 평점 높은 순 정렬
-        try:
-            sort_btn = driver.find_element(By.CSS_SELECTOR, "div.sort_box a[data-sort='rating']")
-            sort_btn.click()
-            time.sleep(2)
-        except NoSuchElementException:
-            pass  # 기본 정렬이면 무시
-
-        # 리뷰 최대 5개까지 수집
-        reviews = driver.find_elements(By.CSS_SELECTOR, "ul.list_review > li")[:5]
-        print(f"{kakao_id} - 리뷰 개수 감지됨: {len(reviews)}")
+        reviews = driver.find_elements(By.CSS_SELECTOR, "ul.list_review > li")
+        stored_count = 0
+        reserved_4s = []
 
         for review in reviews:
-            try:
-                rating = len(review.find_elements(By.CSS_SELECTOR, "span.ico_star.full"))
-                comment = review.find_element(By.CSS_SELECTOR, "p.txt_comment").text.strip()
-                date_text = review.find_element(By.CSS_SELECTOR, "span.txt_date").text.strip()
-                created_at = datetime.strptime(date_text, "%Y.%m.%d").date()
+            if stored_count >= 5:
+                break
 
-                # 중복 여부 확인
-                cursor.execute("""
-                    SELECT COUNT(*) FROM review 
-                    WHERE restaurant_id = %s AND comment = %s AND created_at = %s
-                """, (restaurant_id, comment, created_at))
-                if cursor.fetchone()[0] > 0:
-                    print(f"⚠️ 중복 리뷰 건너뜀")
+            try:
+                # 별점
+                rating_elem = review.find_element(By.CSS_SELECTOR, "span.starred_grade span.screen_out:nth-of-type(2)")
+                rating_text = rating_elem.get_attribute("textContent").strip()
+                if not rating_text:
+                    continue
+                rating = float(rating_text)
+
+                # 작성일
+                date_elem = review.find_element(By.CSS_SELECTOR, "span.txt_date")
+                created_at = date_elem.text.strip().replace(".", "-")[:-1]
+
+                # 후기 내용
+                try:
+                    # 더보기 클릭
+                    try:
+                        more_btn = review.find_element(By.CSS_SELECTOR, "p.desc_review .btn_more")
+                        driver.execute_script("arguments[0].click();", more_btn)
+                        time.sleep(0.3)
+                    except NoSuchElementException:
+                        pass
+
+                    comment_elem = review.find_element(By.CSS_SELECTOR, "p.desc_review")
+                    comment = comment_elem.text.strip().replace("접기", "").strip()
+                    if not comment:
+                        continue
+                except NoSuchElementException:
                     continue
 
-                # 삽입
-                cursor.execute("""
-                    INSERT INTO review (restaurant_id, rating, comment, created_at)
-                    VALUES (%s, %s, %s, %s)
-                """, (restaurant_id, rating, comment, created_at))
 
-            except NoSuchElementException:
-                print(f"⚠️ 리뷰 항목 파싱 실패 - 건너뜀")
-                continue
+                if rating == 5.0:
+                    cursor.execute("""
+                        INSERT IGNORE INTO review (restaurant_id, rating, comment, created_at)
+                        VALUES (%s, %s, %s, %s)
+                    """, (restaurant_id, rating, comment, created_at))
+                    conn.commit()
+                    stored_count += 1
 
-        conn.commit()
-        print(f"✅ {kakao_id} 리뷰 저장 완료")
+                elif rating == 4.0:
+                    reserved_4s.append((restaurant_id, rating, comment, created_at))
 
-    except WebDriverException as e:
-        print(f"❌ {kakao_id} 오류 발생: {e}")
-        continue
+            except Exception as e:
+                print(f"❌ 리뷰 파싱 실패 (kakao_id {kakao_id}): {e}")
+            
 
-# -----------------------------
-# 종료 처리
-# -----------------------------
+        # 5개 미만이면 4.0으로 보충
+        for entry in reserved_4s:
+            if stored_count >= 5:
+                break
+            cursor.execute("""
+                INSERT IGNORE INTO review (restaurant_id, rating, comment, created_at)
+                VALUES (%s, %s, %s, %s)
+            """, entry)
+            conn.commit()
+            stored_count += 1
+            print(f"➕ 보충 저장 (restaurant_id={entry[0]}, 날짜={entry[3]})")
+        print(f"✅ 리뷰 저장 완료 (restaurant_id={restaurant_id})")
+    except Exception as e:
+        print(f"❌ 가게 접근 실패 (kakao_id {kakao_id}): {e}")
+
+# 마무리
 driver.quit()
 conn.close()

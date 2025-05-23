@@ -9,8 +9,9 @@
 --   open_time VARCHAR(100) NOT NULL,                      -- 영업시간 (예: 11:00~21:30)
 --   main_image_url VARCHAR(255),                          -- 대표 이미지 URL (없으면 NULL)
 --   kakao_id VARCHAR(50) NOT NULL UNIQUE,                 -- Kakao 고유 장소 ID (중복 방지 키)
---   kakao_url VARCHAR(255) NOT NULL,                       -- Kakao 상세 페이지 URL
---   rating DECIMAL(2,1) DEFAULT 0.0                        -- 별점 정보 0.0
+--   rating DECIMAL(2,1) DEFAULT 0.0,                      -- 평균 별점 정보 (예: 3.5)
+--   location_tag ENUM('정문', '후문', '기타') DEFAULT '기타' -- 음식점 위치 태그 (정문/후문/기타)
+--   is_new BOOLEAN DEFAULT FALSE                          -- 신규 개장 음식점 여부
 -- );
 
 /*
@@ -24,9 +25,11 @@ CREATE TABLE IF NOT EXISTS restaurant (
   open_time VARCHAR(100) NOT NULL,
   main_image_url VARCHAR(255),
   kakao_id VARCHAR(50) NOT NULL UNIQUE,
-  kakao_url VARCHAR(255) NOT NULL
-  rating DECIMAL(2,1) DEFAULT 0.0
+  rating DECIMAL(2,1) DEFAULT 0.0,
+  location_tag ENUM('정문', '후문', '기타') DEFAULT '기타',
+  is_new BOOLEAN DEFAULT FALSE
 );
+
 */
 
 -- menu
@@ -41,6 +44,7 @@ CREATE TABLE IF NOT EXISTS menu (
   image_url VARCHAR(255),
   FOREIGN KEY (restaurant_id) REFERENCES restaurant(id) ON DELETE CASCADE
 );
+
 */
 
 -- review
@@ -59,10 +63,11 @@ CREATE TABLE IF NOT EXISTS menu (
 CREATE TABLE IF NOT EXISTS review (
   id INT PRIMARY KEY AUTO_INCREMENT,
   restaurant_id INT NOT NULL,
-  rating INT NOT NULL,
+  rating DECIMAL(2,1) DEFAULT 0.0,
   comment TEXT NOT NULL,
   created_at DATE NOT NULL,
   FOREIGN KEY (restaurant_id) REFERENCES restaurant(id) ON DELETE CASCADE,
   UNIQUE (restaurant_id, comment, created_at)
 );
+
 */

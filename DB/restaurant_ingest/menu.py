@@ -7,9 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from datetime import datetime
 
-# -----------------------------
 # DB 연결
-# -----------------------------
 conn = pymysql.connect(
     host='localhost',
     user='root',
@@ -19,32 +17,24 @@ conn = pymysql.connect(
 )
 cursor = conn.cursor()
 
-# -----------------------------
 # Selenium 설정
-# -----------------------------
 options = Options()
 options.add_argument('--headless')  # 필요시 활성화
 options.add_argument('--disable-gpu')
 driver = webdriver.Chrome(options=options)
 
-# -----------------------------
 # restaurant 테이블에서 음식점 목록 가져오기
-# -----------------------------
-cursor.execute("SELECT id, kakao_id FROM restaurant")
+cursor.execute("SELECT id, kakao_id FROM restaurant ORDER BY id ASC")
 restaurants = cursor.fetchall()
 
-# -----------------------------
 # 각 음식점에 대해 메뉴 크롤링 시작
-# -----------------------------
 for restaurant_id, kakao_id in restaurants:
     try:
         url = f"https://place.map.kakao.com/m/{kakao_id}"
         driver.get(url)
         time.sleep(3)
 
-        # -----------------------------
         # 메뉴/배달 탭 클릭 및 더보기 버튼 처리
-        # -----------------------------
         try:
             tabs = driver.find_elements(By.CSS_SELECTOR, 'a[role="tab"]')
             menu_tab, delivery_tab = None, None
@@ -87,9 +77,7 @@ for restaurant_id, kakao_id in restaurants:
         except Exception as e:
             print(f"{kakao_id} 탭 처리 오류: {e}")
 
-        # -----------------------------
         # 메뉴 항목 파싱
-        # -----------------------------
         menus = driver.find_elements(By.CSS_SELECTOR, 'ul.list_goods > li')
         print(f"{kakao_id} 메뉴 개수: {len(menus)}")
 
@@ -148,8 +136,5 @@ for restaurant_id, kakao_id in restaurants:
         print(f"❌ {kakao_id} 페이지 로딩 실패: {e}")
         continue
 
-# -----------------------------
-# 종료 처리
-# -----------------------------
 driver.quit()
 conn.close()

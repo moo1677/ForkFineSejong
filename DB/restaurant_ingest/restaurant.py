@@ -34,14 +34,14 @@ categories = {
 }
 
 url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-n = 1
+n = 10
 
-# ✅ 정문/후문 기준 좌표 상수화
+# 정문/후문 기준 좌표 상수화
 MAIN_GATE = (37.549048, 127.075217)
 BACK_GATE = (37.552936, 127.072474)
 DIST_STD = 400  # 미터
 
-# ✅ 위치 판별 함수
+# 위치 판별 함수
 def get_location_tag(lat, lon):
     def haversine(lat1, lon1, lat2, lon2):
         R = 6371e3
@@ -131,6 +131,13 @@ for category, keyword in categories.items():
                 # 신규 음식점 전체 정보 수집
                 driver.get(f"https://place.map.kakao.com/{kakao_id}")
                 time.sleep(2)
+                
+                # 후기 탭 확인 후 없으면 저장 스킵
+                try:
+                    driver.find_element(By.CSS_SELECTOR, 'a.link_tab[href="#comment"]')
+                except NoSuchElementException:
+                    print(f"❌ 후기 탭 없음, {doc['place_name']} 저장 스킵")
+                    continue
 
                 try:
                     rating_elem = driver.find_element(By.CSS_SELECTOR, 'span.starred_grade > span.num_star')
