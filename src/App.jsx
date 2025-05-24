@@ -44,6 +44,7 @@ function App() {
         setInputText={setInputText}
         setSearchText={setSearchText}
         resetAllFilters={resetAllFilters}
+        restaurantData={restaurantData}
       />
       <Routes>
         <Route
