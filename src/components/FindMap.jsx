@@ -37,6 +37,7 @@ const FindMap = ({ restaurants }) => {
               >
                 <div className="restaurant-header">
                   <h3 className="restaurant-name">{restaurant.name}</h3>
+
                   <div className="rating-score">
                     <strong>{restaurant.rating}</strong>점 · ⭐{" "}
                     <span className="review-count">
@@ -44,7 +45,7 @@ const FindMap = ({ restaurants }) => {
                     </span>
                   </div>
                 </div>
-
+                <div className="restaurant-desc">{restaurant.desc}</div>
                 <div className="tags">
                   {restaurant.menu?.slice(0, 3).map((m, idx) => (
                     <span key={idx} className="tag">
@@ -76,6 +77,13 @@ const FindMap = ({ restaurants }) => {
                       <img src={good} /> // 혹은 <div>good</div> 원하면
                     );
                   })()}
+                </div>
+                <div className="review_comment">
+                  {restaurant.reviews && restaurant.reviews.length > 0 ? (
+                    <>"{restaurant.reviews[0].comment}"</>
+                  ) : (
+                    "리뷰가 없어요.."
+                  )}
                 </div>
               </div>
             ))

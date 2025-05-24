@@ -9,8 +9,12 @@
   flex: 1;
   max-width: 480px;
   height: 100vh;
-  overflow-y: scroll; /* 스크롤은 여기만 */
-  scrollbar-width: none; /* Firefox */
+  overflow-y: scroll;
+  scrollbar-width: none;
+  position: relative; /* ✅ z-index 쓸 수 있게 */
+  z-index: 10; /* ✅ 맵보다 위로 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); /* ✅ 진짜 그림자 */
+  background-color: #fff;
 }
 
 .restaurant-list-wrapper::-webkit-scrollbar {
@@ -32,12 +36,18 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #ddd;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.restaurant-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .restaurant-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0;
 }
 
 .restaurant-title {
@@ -116,4 +126,23 @@
   padding: 2rem;
   font-size: 1.1rem;
   color: #666;
+}
+
+.review_comment {
+  display: flex;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.restaurant-desc {
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 1rem;
+  color: #666;
+}
+.restaurant-name {
+  font-size: 1.4rem;
+  margin: 1rem 0;
 }
