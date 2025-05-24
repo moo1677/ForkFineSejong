@@ -204,10 +204,14 @@
 .addr {
   font-size: 0.85rem;
   color: #888;
-  margin-top: 0.2rem;
+  align-self: center;
+  margin: 0.1rem 1rem;
+  padding-top: 5px;
 }
 
 .delete-keyword {
+  background: none;
+  border: none;
   color: #bbb;
   font-size: 1rem;
   cursor: pointer;

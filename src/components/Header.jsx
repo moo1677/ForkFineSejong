@@ -94,12 +94,16 @@ const Header = ({
   };
 
   // 검색창 포커스 해제 시 포커스 상태 false 처리
-  const handleInputBlur = () => {
+  const handleInputBlur = (e) => {
+    const related = e.relatedTarget;
+    if (related && related.classList.contains("delete-keyword")) return;
     setTimeout(() => setIsFocused(false), 100);
   };
 
   // 최근 검색어 삭제
-  const deleteKeyword = (target) => {
+  const deleteKeyword = (target, e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const isText = typeof target === "string";
     const updated = recentKeywords.filter((k) =>
       isText ? k !== target : typeof k === "string" || k.id !== target.id
@@ -205,12 +209,13 @@ const Header = ({
                               {name}
                             </span>
                             {address && <p className="addr">{address}</p>}
-                            <span
+                            <button
                               className="delete-keyword"
-                              onClick={() => deleteKeyword(item)}
+                              tabIndex={-1}
+                              onClick={(e) => deleteKeyword(item, e)}
                             >
                               x
-                            </span>
+                            </button>
                           </li>
                         );
                       })}
