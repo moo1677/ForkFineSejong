@@ -3,7 +3,7 @@
 .store-intro,
 .store-info,
 .review-card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06); /* ✨ 부드러운 그림자 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
 .app {
@@ -190,4 +190,5 @@
   color: #fff;
   text-align: center;
   border: none;
+  cursor: pointer;
 }

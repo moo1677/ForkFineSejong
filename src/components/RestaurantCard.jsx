@@ -6,7 +6,8 @@ const RestaurantCard = ({ restaurant }) => {
 
   const handleClick = () => {
     const encodedName = encodeURIComponent(restaurant.name);
-    navigate(`/restaurant/${encodedName}`);
+    const url = `${window.location.origin}/restaurant/${encodedName}`;
+    window.open(url, "_blank");
   };
 
   return (
