@@ -1,6 +1,7 @@
 import "./FindMap.css";
 import KakaoMapList from "./KakaoMapList";
 import { useLocation } from "react-router-dom";
+import good from "../asset/default_thumb.png";
 
 const FindMap = ({ restaurants }) => {
   const location = useLocation();
@@ -55,16 +56,26 @@ const FindMap = ({ restaurants }) => {
                 <p className="address">📍 {restaurant.address}</p>
 
                 <div className="image-list">
-                  {restaurant.menu
-                    ?.filter((m) => m.image && m.image !== "...")
-                    .slice(0, 3)
-                    .map((m, idx) => (
-                      <img
-                        key={idx}
-                        src={m.image}
-                        alt={`${restaurant.name} 메뉴 ${idx + 1}`}
-                      />
-                    ))}
+                  {(() => {
+                    const images =
+                      restaurant.menu?.filter(
+                        (m) => m.image && m.image !== ""
+                      ) || [];
+
+                    return images.length > 0 ? (
+                      images
+                        .slice(0, 3)
+                        .map((m, idx) => (
+                          <img
+                            key={idx}
+                            src={m.image}
+                            alt={`${restaurant.name} 메뉴 ${idx + 1}`}
+                          />
+                        ))
+                    ) : (
+                      <img src={good} /> // 혹은 <div>good</div> 원하면
+                    );
+                  })()}
                 </div>
               </div>
             ))
