@@ -1,4 +1,5 @@
 import "./RestaurantDetail.css";
+import githubImage from "../asset/github.svg";
 import KakaoMap from "./KakaoMap.jsx";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
@@ -101,10 +102,18 @@ const RestaurantDetail = ({ restaurants }) => {
         <div className="footer-inner">
           <div className="footer-text">
             <h3>세종대 맛집 지도</h3>
-            <p>&copy; 2025 맛잘알 팀</p>
+            <p>Copyright &copy;2025 </p>
+            <p> Fork&Find Team</p>
           </div>
           <div className="footer-icons">
-            <div className="footer-icon">F</div>
+            <button
+              className="footer-icon"
+              onClick={() =>
+                window.open("https://github.com/der0zz/ForkFineSejong")
+              }
+            >
+              <img src={githubImage} alt="로고" height="36" width="36" />
+            </button>
             <div className="footer-icon">I</div>
             <div className="footer-icon">T</div>
           </div>

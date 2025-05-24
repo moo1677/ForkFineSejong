@@ -169,6 +169,7 @@
 .footer-text p {
   margin: 0;
   font-size: 0.9rem;
+  color: grey;
 }
 
 /* ── 소셜 미디어 아이콘 섹션 ── */
@@ -180,7 +181,7 @@
 .footer-icon {
   width: 36px;
   height: 36px;
-  background: #999;
+  background: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -188,4 +189,5 @@
   font-size: 0.8rem;
   color: #fff;
   text-align: center;
+  border: none;
 }
