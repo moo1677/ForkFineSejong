@@ -1,0 +1,119 @@
+.find-map-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 리스트 감싸는 박스 */
+.restaurant-list-wrapper {
+  flex: 1;
+  max-width: 480px;
+  height: 100vh;
+  overflow-y: scroll; /* 스크롤은 여기만 */
+  scrollbar-width: none; /* Firefox */
+}
+
+.restaurant-list-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* 리스트 안에 카드들 */
+.restaurant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.restaurant-item {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.restaurant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.restaurant-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.2rem;
+}
+
+.restaurant-title h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.score {
+  color: #2c80ff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.star {
+  color: #f5b301;
+  font-size: 1.1rem;
+}
+
+.review {
+  color: #777;
+  font-size: 0.95rem;
+  margin-right: 0.5rem;
+}
+
+.tags {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background-color: #f2f2f2;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.address {
+  margin-top: 0.8rem;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.image-list {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.image-list img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.map-area {
+  flex: 3;
+  background-color: #eee;
+}
+.left-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
+.no-result {
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #666;
+}

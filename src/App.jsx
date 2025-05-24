@@ -1,87 +1,73 @@
 import "./App.css";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import CategoryFilter from "./components/CategoryFilter.jsx";
 import RestaurantDetail from "./components/RestaurantDetail.jsx";
 import RestaurantList from "./components/RestaurantList.jsx";
 import MainBanner from "./components/MainBanner";
+import FindMap from "./components/FindMap.jsx";
 
 import { Routes, Route } from "react-router-dom";
-// 1. "/" 메인 홈 페이지
-// 2. "/Card" 음식점 상세 페이지
+
 function App() {
-  /**음식점 데이터 상태 */
   const [restaurantData, setRestaurantData] = useState([]);
-
-  /** 카테고리를 바꾸는 useState */
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  /** 검색어를 바꾸는 useState */
   const [searchText, setSearchText] = useState("");
-  /** 검색창의 검색어를 바꾸는 useState */
   const [inputText, setInputText] = useState("");
+  const location = useLocation();
+  const isFindMap = location.pathname === "/find";
 
-  /** 페이지의 상태를 모두 초기화 하는 함수 */
   const resetAllFilters = () => {
     setSelectedCategory("전체");
     setSearchText("");
     setInputText("");
   };
-
-  /** 음식점 데이터 API 호출 */
-  // useEffect(() => {
-  //   fetch("http://localhost:8080/api/restaurants")
-  //     .then((res) => res.json())
-  //     .then((data) => setRestaurantData(data))
-  //     .catch((err) => {
-  //       console.error("음식점 데이터를 가져오는 데 실패했습니다:", err);
-  //     });
-  // }, []);
   useEffect(() => {
-    // 더미 데이터
     const dummyData = [
       {
         id: 1,
         name: "맘스터치",
         category: "분식",
         desc: "맛있는 버거와 후라이드치킨",
-        image: "https://via.placeholder.com/150", // 임시 이미지
+        image: "",
         rating: 4.3,
         menu: [
           {
             name: "싸이순살버거",
             price: 4500,
             desc: "대표 메뉴",
-            image: "...",
+            image: "",
           },
-          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "" },
           {
             name: "싸이순살버거",
             price: 4500,
             desc: "대표 메뉴",
-            image: "...",
+            image: "",
           },
-          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "" },
           {
             name: "싸이순살버거",
             price: 4500,
             desc: "대표 메뉴",
-            image: "...",
+            image: "",
           },
-          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "" },
           {
             name: "싸이순살버거",
             price: 4500,
             desc: "대표 메뉴",
-            image: "...",
+            image: "",
           },
-          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "" },
           {
             name: "싸이순살버거",
             price: 4500,
             desc: "대표 메뉴",
-            image: "...",
+            image: "",
           },
-          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "..." },
+          { name: "감자튀김", price: 2000, desc: "사이드 메뉴", image: "" },
         ],
         reviews: [
           { user: "철수", comment: "맛있어요!" },
@@ -104,7 +90,7 @@ function App() {
         name: "홍콩반점",
         category: "중식",
         desc: "짜장면과 탕수육의 명가",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.0,
         reviews: [
           { user: "철수", comment: "맛있어요!" },
@@ -120,23 +106,24 @@ function App() {
         name: "이자카야 하나",
         category: "일식",
         desc: "사케와 함께하는 스시",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.7,
       },
       {
         id: 4,
-        name: "맘스터치",
+        name: "몸스터치",
         category: "분식",
         desc: "맛있는 버거와 후라이드치킨",
-        image: "https://via.placeholder.com/150", // 임시 이미지
+        image: "",
         rating: 4.3,
+        address: "충청남도 예산군 예산읍 아리랑로 93-10",
       },
       {
         id: 5,
         name: "홍콩반점",
         category: "중식",
         desc: "짜장면과 탕수육의 명가",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.0,
       },
       {
@@ -144,7 +131,7 @@ function App() {
         name: "이자카야 하나",
         category: "일식",
         desc: "사케와 함께하는 스시",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.7,
       },
       {
@@ -152,7 +139,7 @@ function App() {
         name: "맘스터치",
         category: "분식",
         desc: "맛있는 버거와 후라이드치킨",
-        image: "https://via.placeholder.com/150", // 임시 이미지
+        image: "",
         rating: 4.3,
       },
       {
@@ -160,7 +147,7 @@ function App() {
         name: "홍콩반점",
         category: "중식",
         desc: "짜장면과 탕수육의 명가",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.0,
       },
       {
@@ -168,7 +155,7 @@ function App() {
         name: "이자카야 하나",
         category: "일식",
         desc: "사케와 함께하는 스시",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.7,
       },
       {
@@ -176,7 +163,7 @@ function App() {
         name: "맘스터치",
         category: "분식",
         desc: "맛있는 버거와 후라이드치킨",
-        image: "https://via.placeholder.com/150", // 임시 이미지
+        image: "",
         rating: 4.3,
       },
       {
@@ -184,7 +171,7 @@ function App() {
         name: "홍콩반점",
         category: "중식",
         desc: "짜장면과 탕수육의 명가",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.0,
       },
       {
@@ -192,7 +179,7 @@ function App() {
         name: "이자카야 하나",
         category: "일식",
         desc: "사케와 함께하는 스시",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.7,
       },
       {
@@ -200,7 +187,7 @@ function App() {
         name: "맘스터치",
         category: "분식",
         desc: "맛있는 버거와 후라이드치킨",
-        image: "https://via.placeholder.com/150", // 임시 이미지
+        image: "",
         rating: 4.3,
       },
       {
@@ -208,7 +195,7 @@ function App() {
         name: "홍콩반점",
         category: "중식",
         desc: "짜장면과 탕수육의 명가",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.0,
       },
       {
@@ -216,16 +203,16 @@ function App() {
         name: "이자카야 하나",
         category: "일식",
         desc: "사케와 함께하는 스시",
-        image: "https://via.placeholder.com/150",
+        image: "",
         rating: 4.7,
       },
     ];
 
-    // 백엔드 없이 더미 데이터만 바로 넣음
     setRestaurantData(dummyData);
   }, []);
+
   return (
-    <div className="App">
+    <div className={isFindMap ? "App no-scroll" : "App"}>
       <Header
         inputText={inputText}
         setInputText={setInputText}
@@ -252,15 +239,16 @@ function App() {
           }
         />
         <Route
-          path="/restaurant/:name"
-          element={
-            <>
-              <RestaurantDetail restaurants={restaurantData} />
-            </>
-          }
+          path="/restaurant/:id"
+          element={<RestaurantDetail restaurants={restaurantData} />}
+        />
+        <Route
+          path="/find"
+          element={<FindMap restaurants={restaurantData} />}
         />
       </Routes>
     </div>
   );
 }
+
 export default App;

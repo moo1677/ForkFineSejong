@@ -1,6 +1,7 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
+import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
 
 const Header = ({
@@ -12,15 +13,106 @@ const Header = ({
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [recentKeywords, setRecentKeywords] = useState([]);
-  const [isShowingRecent, setIsShowingRecent] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const searchBoxRef = useRef(null);
+  const lastOpened = useRef("");
 
+  // 문자열 포함 여부 확인
+  const includesQuery = (text, query) => {
+    if (!text || !query) return false;
+    return text.toLowerCase().includes(query.toLowerCase());
+  };
+
+  // 최근 검색어 저장
+  const saveKeyword = (item) => {
+    let saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
+    const isSame =
+      typeof item === "string"
+        ? (k) => k === item
+        : (k) => typeof k === "object" && k.id === item.id;
+
+    saved = [item, ...saved.filter((k) => !isSame(k))].slice(0, 5);
+    localStorage.setItem("recentKeywords", JSON.stringify(saved));
+    setRecentKeywords(saved);
+  };
+
+  // 검색 실행 및 중복 방지
+  const triggerSearch = () => {
+    if (!inputText.trim()) return;
+
+    const encoded = encodeURIComponent(inputText.trim());
+    if (lastOpened.current === encoded) return;
+    lastOpened.current = encoded;
+
+    setSearchText(inputText);
+    saveKeyword(inputText);
+    window.open(`/find?query=${encoded}`);
+  };
+
+  // Enter 키 입력 시 검색
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      triggerSearch();
+    }
+  };
+
+  // 추천 음식점 클릭 시 이동
+  const handleSuggestionClick = (restaurant) => {
+    saveKeyword(restaurant);
+    window.open(`/restaurant/${restaurant.id}`);
+    setSuggestions([]);
+  };
+
+  // 검색창 입력 시 상태 및 추천어 업데이트
+  const onChangeContent = (e) => {
+    const keyword = e.target.value;
+    setInputText(keyword);
+
+    if (keyword.trim() === "") {
+      const saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
+      setRecentKeywords(saved);
+      setSuggestions([]);
+      return;
+    }
+
+    const filtered = restaurantData.filter((r) =>
+      includesQuery(r.name, keyword)
+    );
+    setSuggestions(filtered);
+  };
+
+  // 검색창 포커스 시 최근 검색어 불러오기
+  const handleInputFocus = () => {
+    setIsFocused(true);
+    const saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
+    setRecentKeywords(saved);
+
+    if (inputText.trim() === "") {
+      setSuggestions([]);
+    }
+  };
+
+  // 검색창 포커스 해제 시 포커스 상태 false 처리
+  const handleInputBlur = () => {
+    setTimeout(() => setIsFocused(false), 100);
+  };
+
+  // 최근 검색어 삭제
+  const deleteKeyword = (target) => {
+    const isText = typeof target === "string";
+    const updated = recentKeywords.filter((k) =>
+      isText ? k !== target : typeof k === "string" || k.id !== target.id
+    );
+    localStorage.setItem("recentKeywords", JSON.stringify(updated));
+    setRecentKeywords(updated);
+  };
+
+  // 검색창 외부 클릭 시 추천어 닫기
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchBoxRef.current && !searchBoxRef.current.contains(e.target)) {
-        setInputText("");
         setSuggestions([]);
-        setIsShowingRecent(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -29,85 +121,22 @@ const Header = ({
     };
   }, []);
 
-  const onChangeContent = (e) => {
-    const keyword = e.target.value;
-    setInputText(keyword);
-    const saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
-
-    if (keyword.trim() === "") {
-      setRecentKeywords(saved);
-      setSuggestions(saved.map((k) => ({ name: k, address: "" })));
-      setIsShowingRecent(true);
-      return;
-    }
-
-    const filtered = restaurantData.filter((r) =>
-      r.name.toLowerCase().includes(keyword.toLowerCase())
-    );
-
-    if (filtered.length === 0) {
-      setRecentKeywords(saved);
-      setSuggestions(saved.map((k) => ({ name: k, address: "" })));
-      setIsShowingRecent(true);
-    } else {
-      setSuggestions(filtered);
-      setIsShowingRecent(false);
-    }
-  };
-
-  const saveKeyword = (keyword) => {
-    if (!keyword) return;
-    let saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
-    saved = [keyword, ...saved.filter((k) => k !== keyword)].slice(0, 5);
-    localStorage.setItem("recentKeywords", JSON.stringify(saved));
-    setRecentKeywords(saved);
-  };
-
-  const handleSuggestionClick = (name) => {
-    saveKeyword(name);
-    const url = `${window.location.origin}/restaurant/${encodeURIComponent(
-      name
-    )}`;
-    window.open(url, "_blank");
-    setSuggestions([]);
-  };
-
-  const handleInputFocus = () => {
-    const saved = JSON.parse(localStorage.getItem("recentKeywords")) || [];
-    setRecentKeywords(saved);
-    setSuggestions(saved.map((k) => ({ name: k, address: "" })));
-    setIsShowingRecent(true);
-  };
-
-  const clearAllRecentKeywords = () => {
-    localStorage.removeItem("recentKeywords");
-    setRecentKeywords([]);
-    setSuggestions([]);
-  };
-
-  const deleteKeyword = (keyword) => {
-    const updated = recentKeywords.filter((k) => k !== keyword);
-    localStorage.setItem("recentKeywords", JSON.stringify(updated));
-    setRecentKeywords(updated);
-    setSuggestions(updated.map((k) => ({ name: k, address: "" })));
-  };
+  const showRecent = isFocused && suggestions.length === 0;
 
   return (
     <>
-      {(isShowingRecent || suggestions.length > 0) && (
+      {(showRecent || suggestions.length > 0) && (
         <div
           className="search-overlay"
           onClick={() => {
             setInputText("");
             setSuggestions([]);
-            setIsShowingRecent(false);
           }}
         />
       )}
 
       <header className="app-header">
         <div className="header-inner">
-          {/* 왼쪽: 로고 */}
           <div className="header-left">
             <Link className="logo" to="/" onClick={resetAllFilters}>
               로고
@@ -115,14 +144,11 @@ const Header = ({
             <span className="brand">F&FS</span>
           </div>
 
-          {/* 중앙: 검색창 */}
           <div className="header-center">
             <div
               ref={searchBoxRef}
               className={`search-box ${
-                suggestions.length > 0 || isShowingRecent
-                  ? "has-suggestions"
-                  : ""
+                showRecent || suggestions.length > 0 ? "has-suggestions" : ""
               }`}
             >
               <input
@@ -132,70 +158,90 @@ const Header = ({
                 value={inputText}
                 onChange={onChangeContent}
                 onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                onKeyDown={handleKeyDown}
               />
-              <button className="search-btn">
+              <button
+                type="button"
+                className="search-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  triggerSearch();
+                }}
+              >
                 <CiSearch className="search-icon" />
               </button>
 
-              {(isShowingRecent || suggestions.length > 0) && (
+              {showRecent && (
                 <div className="suggestion-list">
-                  {isShowingRecent ? (
-                    recentKeywords.length > 0 ? (
-                      <>
-                        <div className="suggestion-header">
-                          <span>최근 검색어</span>
-                          <span
-                            className="clear-all"
-                            onClick={clearAllRecentKeywords}
-                          >
-                            모두 지우기
-                          </span>
-                        </div>
-                        <ul>
-                          {recentKeywords.map((keyword, index) => (
-                            <li key={index}>
-                              <span
-                                className="keyword-name"
-                                onClick={() => handleSuggestionClick(keyword)}
-                              >
-                                {keyword}
-                              </span>
-                              <span
-                                className="delete-keyword"
-                                onClick={() => deleteKeyword(keyword)}
-                              >
-                                x
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    ) : (
-                      <div className="no-recent">최근 검색어가 없습니다.</div>
-                    )
-                  ) : (
+                  <div className="suggestion-header">
+                    <span>최근 검색</span>
+                  </div>
+                  {recentKeywords.length > 0 ? (
                     <ul>
-                      {suggestions.map((item, index) => (
-                        <li key={index}>
-                          <span
-                            className="keyword-name"
-                            onClick={() => handleSuggestionClick(item.name)}
-                          >
-                            {item.name}
-                          </span>
-                          {item.address && (
-                            <p className="addr">{item.address}</p>
-                          )}
-                        </li>
-                      ))}
+                      {recentKeywords.map((item, index) => {
+                        const isText = typeof item === "string";
+                        const name = isText ? item : item.name;
+                        const address = isText ? null : item.address;
+                        const icon = isText ? (
+                          <FaSearch className="left-icon" />
+                        ) : (
+                          <FaMapMarkerAlt className="left-icon" />
+                        );
+                        return (
+                          <li key={index}>
+                            <span
+                              className="keyword-name"
+                              onClick={() =>
+                                isText
+                                  ? window.open(
+                                      `/find?query=${encodeURIComponent(item)}`
+                                    )
+                                  : window.open(`/restaurant/${item.id}`)
+                              }
+                            >
+                              {icon}
+                              {name}
+                            </span>
+                            {address && <p className="addr">{address}</p>}
+                            <span
+                              className="delete-keyword"
+                              onClick={() => deleteKeyword(item)}
+                            >
+                              x
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ul>
+                  ) : (
+                    <div className="no-recent">최근 검색어가 없습니다.</div>
                   )}
+                </div>
+              )}
+
+              {suggestions.length > 0 && (
+                <div className="suggestion-list">
+                  <ul>
+                    {suggestions.map((item, index) => (
+                      <li key={index}>
+                        <span
+                          className="keyword-name"
+                          onClick={() => handleSuggestionClick(item)}
+                        >
+                          <FaMapMarkerAlt className="left-icon" />
+                          {item.name}
+                        </span>
+                        {item.address && <p className="addr">{item.address}</p>}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
           </div>
 
-          {/* 오른쪽: 메뉴 */}
           <nav className="header-nav">메뉴</nav>
         </div>
       </header>

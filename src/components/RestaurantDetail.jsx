@@ -1,23 +1,25 @@
 import "./RestaurantDetail.css";
 import githubImage from "../asset/github.svg";
-import KakaoMap from "./KakaoMap.jsx";
+import good from "../asset/default_thumb.png";
+import KakaoMapSingle from "./KaKaoMapSingle.jsx";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 
 const RestaurantDetail = ({ restaurants }) => {
-  const { name } = useParams();
-
-  // name과 정확히 일치하는 음식점 찾기
-  const restaurant = restaurants.find((r) => r.name === name);
+  const { id } = useParams();
+  const restaurantId = parseInt(id, 10);
+  const restaurant = restaurants.find((r) => r.id === restaurantId);
 
   const [visibleCount, setVisibleCount] = useState(3);
   const [visibleCountReview, setVisibleCountReview] = useState(5);
+
   if (!restaurant) {
     return <div>음식점 정보를 찾을 수 없습니다.</div>;
   }
-  //리뷰를 visibleCount만큼 자르기,
+
   const reviewsToShow = restaurant.reviews?.slice(0, visibleCountReview) || [];
   const menuToShow = restaurant.menu?.slice(0, visibleCount) || [];
+
   return (
     <>
       <div className="app">
@@ -32,14 +34,14 @@ const RestaurantDetail = ({ restaurants }) => {
           <h3>평점</h3>
           <p>{restaurant.rating}</p>
         </div>
-        {/* 메뉴판 */}
+
         <div className="menu-board">
           <h3>메뉴</h3>
           {menuToShow.length > 0 ? (
             menuToShow.map((item, index) => (
               <div key={index} className="menu-item">
                 <img
-                  src={item.image}
+                  src={item.image ? item.image : good}
                   alt={item.name}
                   className="menu-item-image"
                 />
@@ -57,7 +59,7 @@ const RestaurantDetail = ({ restaurants }) => {
           )}
 
           {restaurant.menu?.length > visibleCount && (
-            <div className="load-more-section.menu-load-more">
+            <div className="load-more-section menu-load-more">
               <button
                 className="load-more-btn"
                 onClick={() => setVisibleCount((prev) => prev + 3)}
@@ -68,7 +70,6 @@ const RestaurantDetail = ({ restaurants }) => {
           )}
         </div>
 
-        {/* 리뷰 섹션 */}
         <div className="review-section">
           <h3>리뷰</h3>
           {reviewsToShow.length > 0 ? (
@@ -83,7 +84,6 @@ const RestaurantDetail = ({ restaurants }) => {
             <p>아직 리뷰가 없습니다.</p>
           )}
 
-          {/* ✅ 리뷰 더보기 버튼 조건도 null-safe하게 수정 */}
           {restaurant.reviews?.length > visibleCountReview && (
             <div className="load-more-section review-load-more">
               <button
@@ -94,10 +94,11 @@ const RestaurantDetail = ({ restaurants }) => {
               </button>
             </div>
           )}
-          <KakaoMap address={restaurant.address} />
+
+          <KakaoMapSingle address={restaurant.address || "주소 없음"} />
         </div>
       </div>
-      {/* 푸터 */}
+
       <footer className="footer">
         <div className="footer-inner">
           <div className="footer-text">
@@ -119,7 +120,6 @@ const RestaurantDetail = ({ restaurants }) => {
           </div>
         </div>
       </footer>
-      {/* 필요시 이미지, 위치, 평점 등 추가 가능 */}
     </>
   );
 };
