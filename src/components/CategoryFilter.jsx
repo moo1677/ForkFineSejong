@@ -1,3 +1,4 @@
+import "./CategoryFilter.css";
 const categories = [
   "전체",
   "한식",
@@ -14,12 +15,13 @@ const CategoryFilter = ({ selectedCategory, setSelectedCategory }) => {
   // selectedCategory : 현재 선택된 카테고리
   // setSelectedCategory : 선택된 카테고리를 바꾸는 함수
   return (
-    <div className="category-container">
+    <div className="filters">
       {categories.map((category) => (
         <button
           key={category}
-          className={selectedCategory === category ? "selected" : ""}
-          //카테고리가 선택되면 버튼의 모양이 바뀜 classname은 "selected"
+          className={`filter-btn ${
+            selectedCategory === category ? "active" : ""
+          }`}
           onClick={() => setSelectedCategory(category)}
         >
           {category}

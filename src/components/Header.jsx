@@ -1,6 +1,8 @@
+import "./Header.css";
 import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { useState, useRef, useEffect } from "react";
+
 const Header = ({
   inputText,
   setInputText,
