@@ -1,18 +1,26 @@
 import "./RestaurantCard.css";
-import { useNavigate } from "react-router-dom";
-
+import good from "../asset/default_thumb.png";
 const RestaurantCard = ({ restaurant }) => {
-  const navigate = useNavigate();
-
   const handleClick = () => {
-    const encodedName = encodeURIComponent(restaurant.name);
-    const url = `${window.location.origin}/restaurant/${encodedName}`;
+    const url = `${window.location.origin}/restaurant/${restaurant.id}`;
     window.open(url, "_blank");
   };
 
   return (
     <button className="card" onClick={handleClick}>
-      <img className="card-img" src />
+      <img
+        className="card-img"
+        src={
+          restaurant.mainImageUrl && restaurant.mainImageUrl.trim() !== ""
+            ? restaurant.mainImageUrl
+            : good // 기본 이미지
+        }
+        alt={restaurant.name}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = good;
+        }}
+      />
       <h3 className="card-title">
         {restaurant.name}
         {restaurant.rating && (

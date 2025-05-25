@@ -5,3 +5,7 @@
   min-height: 100vh;
   padding-top: 55px;
 }
+.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}

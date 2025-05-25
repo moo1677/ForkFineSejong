@@ -1,28 +1,25 @@
 import "./RestaurantList.css";
 import RestaurantCard from "./RestaurantCard";
-import Hangul from "hangul-js";
 
-const RestaurantList = ({ restaurants, selectedCategory, searchText }) => {
-  const filtered = restaurants.filter((restaurant) => {
-    const isCategoryMatch =
-      selectedCategory === "전체" || restaurant.category === selectedCategory;
+const RestaurantList = ({ restaurants = [], selectedCategory = "전체" }) => {
+  const filtered = restaurants.filter(
+    (r) => selectedCategory === "전체" || r.category === selectedCategory
+  );
 
-    const isNameMatch =
-      searchText === "" || Hangul.search(restaurant.name, searchText) > -1;
-
-    return isCategoryMatch && isNameMatch;
-  });
+  if (filtered.length === 0) {
+    return (
+      <section className="grid-section">
+        <p>해당 음식점을 찾을 수 없습니다</p>
+      </section>
+    );
+  }
 
   return (
     <section className="grid-section">
       <div className="card-grid">
-        {filtered.length === 0 ? (
-          <p>해당 음식점을 찾을 수 없습니다</p>
-        ) : (
-          filtered.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-          ))
-        )}
+        {filtered.map((restaurant) => (
+          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+        ))}
       </div>
     </section>
   );
