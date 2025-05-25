@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import RestaurantCard from "./RestaurantCard";
 import "./LocationFilter.css";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
 const LocationFilter = ({ restaurants = [], locationFilter }) => {
   const containerRef = useRef();
@@ -21,7 +22,7 @@ const LocationFilter = ({ restaurants = [], locationFilter }) => {
 
       <div className="scroll-wrapper">
         <button className="scroll-btn left" onClick={scrollLeft}>
-          &lt;
+          <HiOutlineChevronLeft size={24} />
         </button>
 
         <div className="card-row" ref={containerRef}>
@@ -31,7 +32,7 @@ const LocationFilter = ({ restaurants = [], locationFilter }) => {
         </div>
 
         <button className="scroll-btn right" onClick={scrollRight}>
-          &gt;
+          <HiOutlineChevronRight size={24} />
         </button>
       </div>
     </section>
