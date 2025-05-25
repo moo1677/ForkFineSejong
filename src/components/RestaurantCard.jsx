@@ -10,8 +10,16 @@ const RestaurantCard = ({ restaurant }) => {
     <button className="card" onClick={handleClick}>
       <img
         className="card-img"
-        src={restaurant.image ? restaurant.image : good}
+        src={
+          restaurant.mainImageUrl && restaurant.mainImageUrl.trim() !== ""
+            ? restaurant.mainImageUrl
+            : good // 기본 이미지
+        }
         alt={restaurant.name}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = good;
+        }}
       />
       <h3 className="card-title">
         {restaurant.name}

@@ -3,31 +3,58 @@ import githubImage from "../asset/github.svg";
 import good from "../asset/default_thumb.png";
 import KakaoMapSingle from "./KaKaoMapSingle.jsx";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const RestaurantDetail = ({ restaurants }) => {
   const { id } = useParams();
   const restaurantId = parseInt(id, 10);
   const restaurant = restaurants.find((r) => r.id === restaurantId);
 
+  const [menu, setMenu] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [visibleCount, setVisibleCount] = useState(3);
   const [visibleCountReview, setVisibleCountReview] = useState(5);
+
+  useEffect(() => {
+    if (!restaurant?.name) return;
+
+    axios
+      .get(
+        `http://49.168.153.165:8080/restaurant/${encodeURIComponent(
+          restaurant.name
+        )}`
+      )
+      .then((res) => {
+        const data = res.data;
+        setMenu(data.menus);
+        setReviews(data.reviews);
+        console.log("[DEBUG] 메뉴 데이터:", data.menus);
+      })
+      .catch((err) => {
+        console.error("음식점 상세 정보 불러오기 실패", err);
+      });
+  }, [restaurant?.name]);
 
   if (!restaurant) {
     return <div>음식점 정보를 찾을 수 없습니다.</div>;
   }
 
-  const reviewsToShow = restaurant.reviews?.slice(0, visibleCountReview) || [];
-  const menuToShow = restaurant.menu?.slice(0, visibleCount) || [];
+  const menuToShow = menu.slice(0, visibleCount);
+  const reviewsToShow = reviews.slice(0, visibleCountReview);
 
+  console.log("요청할 음식점 이름:", restaurant.name);
+  console.log("URI 인코딩된 이름:", encodeURIComponent(restaurant.name));
   return (
     <>
       <div className="app">
         <h2>{restaurant.name}</h2>
+
         <div className="store-intro">
           <h3>매장 소개</h3>
           <p>{restaurant.desc}</p>
         </div>
+
         <div className="store-info">
           <h3>카테고리</h3>
           <p>{restaurant.category}</p>
@@ -40,17 +67,23 @@ const RestaurantDetail = ({ restaurants }) => {
           {menuToShow.length > 0 ? (
             menuToShow.map((item, index) => (
               <div key={index} className="menu-item">
-                <img
-                  src={item.image ? item.image : good}
-                  alt={item.name}
-                  className="menu-item-image"
-                />
+                {item.imageUrl && item.imageUrl.trim() !== "" && (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="menu-item-image"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = good;
+                    }}
+                  />
+                )}
                 <div className="menu-item-content">
                   <div className="menu-title">
                     <span>{item.name}</span>
                     <span className="menu-price">{item.price}원</span>
                   </div>
-                  <p className="menu-desc">{item.desc}</p>
+                  <p className="menu-desc">{item.description}</p>
                 </div>
               </div>
             ))
@@ -58,7 +91,7 @@ const RestaurantDetail = ({ restaurants }) => {
             <p>등록된 메뉴가 없습니다.</p>
           )}
 
-          {restaurant.menu?.length > visibleCount && (
+          {menu.length > visibleCount && (
             <div className="load-more-section menu-load-more">
               <button
                 className="load-more-btn"
@@ -76,7 +109,7 @@ const RestaurantDetail = ({ restaurants }) => {
             reviewsToShow.map((review, index) => (
               <div key={index} className="review-card">
                 <p>
-                  <strong>{review.user}</strong> - {review.comment}
+                  <strong>⭐ {review.rating}</strong> - {review.comment}
                 </p>
               </div>
             ))
@@ -84,7 +117,7 @@ const RestaurantDetail = ({ restaurants }) => {
             <p>아직 리뷰가 없습니다.</p>
           )}
 
-          {restaurant.reviews?.length > visibleCountReview && (
+          {reviews.length > visibleCountReview && (
             <div className="load-more-section review-load-more">
               <button
                 className="load-more-btn"
@@ -104,7 +137,7 @@ const RestaurantDetail = ({ restaurants }) => {
           <div className="footer-text">
             <h3>세종대 맛집 지도</h3>
             <p>Copyright &copy;2025 </p>
-            <p> Fork&Find Team</p>
+            <p>Fork&Find Team</p>
           </div>
           <div className="footer-icons">
             <button

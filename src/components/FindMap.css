@@ -116,6 +116,7 @@
   margin-top: 0.8rem;
   display: flex;
   gap: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .image-list img {
@@ -148,8 +149,6 @@
   padding-bottom: 0;
 }
 .restaurant-desc {
-  margin-top: 0;
-  padding-top: 0;
   font-size: 1rem;
   color: #666;
 }
