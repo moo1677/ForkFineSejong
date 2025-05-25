@@ -1,0 +1,52 @@
+.location-section {
+  margin: 2rem 0;
+  position: relative;
+}
+
+.scroll-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.card-row {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  scroll-snap-type: x mandatory;
+  width: calc(220px * 5);
+}
+
+.card-row::-webkit-scrollbar {
+  display: none;
+}
+
+.card-row > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 220px; /* 카드 너비 */
+}
+
+.scroll-btn {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scroll-btn.left {
+  left: 0;
+}
+
+.scroll-btn.right {
+  right: 0;
+}

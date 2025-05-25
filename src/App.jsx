@@ -7,6 +7,7 @@ import RestaurantDetail from "./components/RestaurantDetail.jsx";
 import RestaurantList from "./components/RestaurantList.jsx";
 import MainBanner from "./components/MainBanner";
 import FindMap from "./components/FindMap.jsx";
+import LocationFilter from "./components/LocationFilter.jsx";
 import axios from "axios";
 
 function App() {
@@ -58,6 +59,18 @@ function App() {
                 restaurants={restaurantData}
                 selectedCategory={selectedCategory}
                 searchText={searchText}
+              />
+              <LocationFilter
+                restaurants={restaurantData}
+                locationFilter="정문"
+              />
+              <LocationFilter
+                restaurants={restaurantData}
+                locationFilter="후문"
+              />
+              <LocationFilter
+                restaurants={restaurantData}
+                locationFilter="기타"
               />
             </>
           }
