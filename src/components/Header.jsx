@@ -94,10 +94,9 @@ const Header = ({
   };
 
   // 검색창 포커스 해제 시 포커스 상태 false 처리
+  // 검색창 포커스 해제 시 포커스 상태 false 처리 (제거됨)
   const handleInputBlur = (e) => {
-    const related = e.relatedTarget;
-    if (related && related.classList.contains("delete-keyword")) return;
-    setTimeout(() => setIsFocused(false), 100);
+    // blur 후 suggestions 유지
   };
 
   // 최근 검색어 삭제
