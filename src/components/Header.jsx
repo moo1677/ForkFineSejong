@@ -116,6 +116,7 @@ const Header = ({
     const handleClickOutside = (e) => {
       if (searchBoxRef.current && !searchBoxRef.current.contains(e.target)) {
         setSuggestions([]);
+        setIsFocused(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
