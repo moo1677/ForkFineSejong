@@ -51,7 +51,7 @@ const RestaurantDetail = ({ restaurants }) => {
         <h2>{restaurant.name}</h2>
         <div className="store-intro">
           <h3>매장 소개</h3>
-          <p>{restaurant.desc}</p>
+          <p>{restaurant.description}</p>
         </div>
         <div className="store-info">
           <h3>카테고리</h3>
@@ -99,6 +99,32 @@ const RestaurantDetail = ({ restaurants }) => {
             </div>
           )}
         </div>
+        <div className="store-detail-section">
+          <div className="store-intro">
+            <h3>매장 소개</h3>
+            <p>{restaurant.description}</p>
+            <img
+              className="store-intro-img"
+              src={
+                restaurant.mainImageUrl && restaurant.mainImageUrl.trim() !== ""
+                  ? restaurant.mainImageUrl
+                  : good // 기본 이미지
+              }
+              alt={restaurant.name}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = good;
+              }}
+            />
+          </div>
+          <div className="store-info">
+            <h3>영업시간</h3>
+            <li>{restaurant.openTime}</li>
+            <li>주소 : {restaurant.address}</li>
+            <li>전화번호 : {restaurant.phone}</li>
+          </div>
+        </div>
+
         <div className="review-section">
           <h3>리뷰</h3>
           {reviewsToShow.length > 0 ? (
@@ -112,7 +138,6 @@ const RestaurantDetail = ({ restaurants }) => {
           ) : (
             <p>아직 리뷰가 없습니다.</p>
           )}
-
           {reviews.length > visibleCountReview && (
             <div className="load-more-section review-load-more">
               <button

@@ -1,4 +1,5 @@
 import "./Header.css";
+import logo from "../asset/logo.png";
 import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
@@ -142,10 +143,10 @@ const Header = ({
       <header className="app-header">
         <div className="header-inner">
           <div className="header-left">
-            <Link className="logo" to="/" onClick={resetAllFilters}>
-              로고
-            </Link>
-            <span className="brand">F&FS</span>
+            <img className="logo" img src={logo} to="/" />
+            <span className="brand" onClick={resetAllFilters}>
+              F&FS
+            </span>
           </div>
 
           <div className="header-center">
