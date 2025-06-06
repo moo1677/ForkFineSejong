@@ -1,7 +1,6 @@
 import "./FindMap.css";
 import KakaoMapList from "./KakaoMapList";
 import { useLocation } from "react-router-dom";
-import good from "../asset/default_thumb.png";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -14,12 +13,11 @@ const FindMap = ({ restaurants }) => {
     ? restaurants.filter((r) => r.name.includes(searchText))
     : [];
 
-  const [detailsMap, setDetailsMap] = useState({}); // name → 상세 데이터 매핑
+  const [detailsMap, setDetailsMap] = useState({});
 
   useEffect(() => {
-    // 검색된 음식점들의 상세정보 불러오기
     filtered.forEach((r) => {
-      if (detailsMap[r.name]) return; // 이미 있으면 skip
+      if (detailsMap[r.name]) return;
       axios
         .get(`/api/restaurant/${encodeURIComponent(r.name)}`)
         .then((res) => {
@@ -33,8 +31,9 @@ const FindMap = ({ restaurants }) => {
         });
     });
   }, [filtered]);
-  // 지도의 기본 마킹은 학교
+
   const fallbackAddress = ["서울특별시 광진구 능동로 209"];
+
   return (
     <div className="find-map-container">
       <div className="restaurant-list-wrapper">
@@ -53,7 +52,6 @@ const FindMap = ({ restaurants }) => {
 
               return (
                 <div
-                  // 음식점 클릭시 해당 음식점의 상세 페이지로 이동
                   onClick={() => {
                     const url = `${window.location.origin}/restaurant/${restaurant.id}`;
                     window.open(url, "_blank");
@@ -61,7 +59,6 @@ const FindMap = ({ restaurants }) => {
                   className="restaurant-item"
                   key={restaurant.id}
                 >
-                  {/* 음식점의 정보 출력 */}
                   <div className="restaurant-header">
                     <h3 className="restaurant-name">{restaurant.name}</h3>
                     <div className="rating-score">
@@ -81,13 +78,15 @@ const FindMap = ({ restaurants }) => {
                   </div>
 
                   <p className="address">📍 {restaurant.address}</p>
-                  {/* 음식점의 이미지 최대 3개 출력 */}
+
                   <div className="image-list">
                     {(() => {
+                      // 메뉴 중 이미지가 있는 항목만 골라낸다
                       const images = menus.filter(
-                        (m) => m.imageUrl && m.imageUrl !== ""
+                        (m) => m.imageUrl && m.imageUrl.trim() !== ""
                       );
 
+                      // 메뉴 이미지가 있을 때만, 최대 3개까지 렌더링
                       if (images.length > 0) {
                         return images.slice(0, 3).map((m, idx) => (
                           <img
@@ -96,36 +95,21 @@ const FindMap = ({ restaurants }) => {
                             alt={`${restaurant.name} 메뉴 ${idx + 1}`}
                             onError={(e) => {
                               e.target.onerror = null;
-                              e.target.src = good;
+                              e.target.src = ""; // 오류 났을 때도 빈 src → 보이지 않음
                             }}
                           />
                         ));
-                      } else if (
-                        restaurant.main_image_url &&
-                        restaurant.main_image_url.trim() !== ""
-                      ) {
-                        return (
-                          <img
-                            src={restaurant.main_image_url}
-                            alt={`${restaurant.name} 대표 이미지`}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = good;
-                            }}
-                          />
-                        );
-                      } else {
-                        return <img src={good} alt="기본 이미지" />;
                       }
+
+                      // 메뉴 이미지가 하나도 없으면 null 반환 → 아무것도 출력하지 않음
+                      return null;
                     })()}
                   </div>
-                  {/* 리뷰 출력 */}
+
                   <div className="review_comment">
-                    {reviews.length > 0 ? (
-                      <>"{reviews[0].comment}"</>
-                    ) : (
-                      "리뷰가 없어요.."
-                    )}
+                    {reviews.length > 0
+                      ? `"${reviews[0].comment}"`
+                      : "리뷰가 없어요.."}
                   </div>
                 </div>
               );
@@ -133,7 +117,7 @@ const FindMap = ({ restaurants }) => {
           )}
         </div>
       </div>
-      {/* 검색된 음식점의 주소를 KakaoMap에 전달하여 마킹으로 표시 */}
+
       <div className="map-area">
         <KakaoMapList
           addresses={
