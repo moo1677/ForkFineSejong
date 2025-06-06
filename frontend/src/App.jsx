@@ -32,12 +32,16 @@ function App() {
   //음식점  데이터 서버에서 불러오기
   useEffect(() => {
     axios
-      .get("http://49.168.153.165:8080/restaurants") // 올바른 백엔드 주소
+      .get("http://3.35.234.131:8080/restaurants") // 올바른 백엔드 주소
       .then((res) => {
         setRestaurantData(res.data); // 성공 시 데이터 세팅
       })
       .catch((err) => {
-        console.error("음식점 데이터를 불러오는데 실패했습니다", err);
+        console.error(
+          "❌ 음식점 데이터를 불러오는데 실패했습니다",
+          err.message,
+          err.response
+        );
       });
   }, []);
   console.log(restaurantData);

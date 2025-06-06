@@ -273,6 +273,7 @@ Spring Boot 백엔드 서버(`localhost:8080`)와 연동하여 음식점 정보�
 ```bash
 cd frontend
 npm install
+npm install react-icons
 npm run dev
 ```
 
