@@ -21,6 +21,7 @@ const RestaurantDetail = ({ restaurants }) => {
 
     axios
       .get(
+        //음식점 상세 데이터 데이터베이스에서 불러옴
         `http://49.168.153.165:8080/restaurant/${encodeURIComponent(
           restaurant.name
         )}`
@@ -90,6 +91,7 @@ const RestaurantDetail = ({ restaurants }) => {
 
           {menu.length > visibleCount && (
             <div className="load-more-section menu-load-more">
+              {/* 메뉴 더보기 버튼 클릭시 메뉴 최대 목록 개수가 3개 늘어남 */}
               <button
                 className="load-more-btn"
                 onClick={() => setVisibleCount((prev) => prev + 3)}
@@ -140,6 +142,7 @@ const RestaurantDetail = ({ restaurants }) => {
           )}
           {reviews.length > visibleCountReview && (
             <div className="load-more-section review-load-more">
+              {/* 리뷰 더보기 버튼 클릭시 리뷰 최대 목록 개수가 5개 늘어남 */}
               <button
                 className="load-more-btn"
                 onClick={() => setVisibleCountReview((prev) => prev + 5)}

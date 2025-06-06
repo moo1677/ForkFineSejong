@@ -16,12 +16,14 @@ const CategoryFilter = ({ selectedCategory, setSelectedCategory }) => {
   // setSelectedCategory : 선택된 카테고리를 바꾸는 함수
   return (
     <div className="filters">
+      {/* map함수를 사용하여 카테고리를 버튼을 출력 */}
       {categories.map((category) => (
         <button
           key={category}
           className={`filter-btn ${
             selectedCategory === category ? "active" : ""
           }`}
+          // 버튼 클릭시 카테고리값을 App.jsx로 보냄
           onClick={() => setSelectedCategory(category)}
         >
           {category}

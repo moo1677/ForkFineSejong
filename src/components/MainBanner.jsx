@@ -16,12 +16,12 @@ const MainBanner = () => {
     const interval = setInterval(() => {
       changeText();
     }, 10000); //10000ms
-
     return () => {
       clearInterval(interval);
     }; //인터벌 정리
   }, []);
   const changeText = () => {
+    //랜덤하게 문구 적용
     const random = Math.floor(Math.random() * bannerText.length);
     setText(bannerText[random]);
   };
