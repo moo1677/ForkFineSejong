@@ -15,7 +15,9 @@ import com.sejong.ffs.repository.RestaurantRepository;
 
 
 @RestController		// REST API 컨트롤러로 지정
-@CrossOrigin(origins = "http://localhost:3000")		// React가 호출할 수 있게 CORS 허용
+// @CrossOrigin(origins = "http://localhost:3000")		// React가 호출할 수 있게 CORS 허용
+// @CrossOrigin(origins = "http://localhost:5173")		// React가 호출할 수 있게 CORS 허용
+@CrossOrigin(origins = "*")		// React가 호출할 수 있게 CORS 허용
 public class MainController {
 	private final RestaurantRepository restaurantRepository;	// Spring이 자동으로 DB 접근 기능 연결
 
@@ -39,9 +41,16 @@ public class MainController {
         Restaurant r = list.get(0); // 같은 이름이 여러 개일 경우 첫 번째만 사용
 
         // 메뉴 DTO 변환
+     // 메뉴 DTO 변환
         List<RestaurantDetailResponse.MenuDto> menus = r.getMenus().stream()
-            .map(m -> new RestaurantDetailResponse.MenuDto(m.getName(), m.getPrice()))
+            .map(m -> new RestaurantDetailResponse.MenuDto(
+                m.getName(),
+                m.getPrice(),
+                m.getDescription(),
+                m.getImageUrl()
+            ))
             .toList();
+
 
         // 리뷰 DTO 변환
         List<RestaurantDetailResponse.ReviewDto> reviews = r.getReviews().stream()
