@@ -1,0 +1,158 @@
+.find-map-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 리스트 감싸는 박스 */
+.restaurant-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 480px;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background-color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  position: relative;
+  box-sizing: border-box; /* padding 포함 높이 계산 */
+  padding-bottom: 4rem; /* 마지막 아이템 아래 여유 공간 */
+}
+/* .restaurant-list::after {
+  content: "";
+  display: block;
+  height: 2000px;
+  background: transparent;
+} */
+.restaurant-list-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* 리스트 안에 카드들 */
+.restaurant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  padding-bottom: 1rem; /* 마지막 카드 잘리지 않도록 */
+}
+
+.restaurant-item {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.restaurant-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.restaurant-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.2rem;
+}
+
+.restaurant-title h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.score {
+  color: #2c80ff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.star {
+  color: #f5b301;
+  font-size: 1.1rem;
+}
+
+.review {
+  color: #777;
+  font-size: 0.95rem;
+  margin-right: 0.5rem;
+}
+
+.tags {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background-color: #f2f2f2;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.address {
+  margin-top: 0.8rem;
+  color: #444;
+  font-size: 0.7rem;
+}
+
+.image-list {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.image-list img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.map-area {
+  flex: 3;
+  background-color: #eee;
+}
+.left-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
+.no-result {
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.review_comment {
+  display: flex;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.restaurant-desc {
+  font-size: 1rem;
+  color: #666;
+}
+.restaurant-name {
+  font-size: 1.4rem;
+  margin: 1rem 0;
+}

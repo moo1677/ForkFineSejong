@@ -1,0 +1,11 @@
+.App {
+  font-family: sans-serif;
+  color: #333;
+  background: #f7f7f7;
+  min-height: 100vh;
+  padding-top: 55px;
+}
+.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}
