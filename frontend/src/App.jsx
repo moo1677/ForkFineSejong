@@ -5,7 +5,7 @@ import Header from "./components/Header.jsx";
 import CategoryFilter from "./components/CategoryFilter.jsx";
 import RestaurantDetail from "./components/RestaurantDetail.jsx";
 import RestaurantList from "./components/RestaurantList.jsx";
-import MainBanner from "./components/MainBanner";
+import MainBanner from "./components/MainBanner.jsx";
 import FindMap from "./components/FindMap.jsx";
 import LocationFilter from "./components/LocationFilter.jsx";
 import axios from "axios";
