@@ -21,7 +21,10 @@ public class RestaurantDetailResponse {
     public static class MenuDto {
         private String name;
         private int price;
+        private String description;     // 메뉴 설명
+        private String imageUrl;        // 이미지 경로
     }
+
 
     @Getter
     @AllArgsConstructor
