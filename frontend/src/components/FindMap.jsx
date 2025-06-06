@@ -21,10 +21,7 @@ const FindMap = ({ restaurants }) => {
     filtered.forEach((r) => {
       if (detailsMap[r.name]) return; // 이미 있으면 skip
       axios
-        .get(
-          //음식점 상세 데이터 데이터베이스에서 불러옴
-          `http://3.35.234.131:8080/restaurant/${encodeURIComponent(r.name)}`
-        )
+        .get(`/api/restaurant/${encodeURIComponent(r.name)}`)
         .then((res) => {
           setDetailsMap((prev) => ({
             ...prev,

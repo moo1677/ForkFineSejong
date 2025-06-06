@@ -32,7 +32,7 @@ function App() {
   //음식점  데이터 서버에서 불러오기
   useEffect(() => {
     axios
-      .get("http://3.35.234.131:8080/restaurants") // 올바른 백엔드 주소
+      .get("/api/restaurants") // 올바른 백엔드 주소
       .then((res) => {
         setRestaurantData(res.data); // 성공 시 데이터 세팅
       })
