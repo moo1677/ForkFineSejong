@@ -8,7 +8,7 @@ import RestaurantList from "./components/RestaurantList.jsx";
 import MainBanner from "./components/MainBanner.jsx";
 import FindMap from "./components/FindMap.jsx";
 import LocationFilter from "./components/LocationFilter.jsx";
-import axios from "axios";
+import api from "./api/axiosInstance";
 
 function App() {
   // 음식점 전체 데이터
@@ -31,8 +31,8 @@ function App() {
   };
   //음식점  데이터 서버에서 불러오기
   useEffect(() => {
-    axios
-      .get("/api/restaurants") // 올바른 백엔드 주소
+    api
+      .get("/restaurants") // 올바른 백엔드 주소
       .then((res) => {
         setRestaurantData(res.data); // 성공 시 데이터 세팅
       })
