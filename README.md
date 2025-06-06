@@ -37,212 +37,81 @@
 
 ```bash
 ForkFineSejong/
-├── frontend/               # React 프로젝트
-│   ├── src/                # 소스 코드 루트
-│   │   ├── asset/              # 로고, 썸네일 등 정적 이미지 리소스
-│   │   ├── components/         # 주요 UI 컴포넌트 모음
-│   │   ├── App.jsx             # 라우팅 및 전체 페이지 구성
+├── frontend/                     # React 프로젝트
+│   ├── src/                      # 소스 코드 루트
+│   │   ├── asset/                # 로고, 썸네일 등 정적 이미지 리소스
+│   │   ├── components/           # 주요 UI 컴포넌트 모음
+│   │   ├── App.jsx               # 라우팅 및 전체 페이지 구성
 │   │   └── …
-│   └── …                    # Vite 설정 파일 등 기타 프론트엔드 자원
-├── backend/              # Spring Boot 프로젝트
-│   ├── src/main/java/com/sejong/ffs/
+│   └── …                         # Vite 설정 파일 등 기타 프론트엔드 자원
+├── backend/                      # Spring Boot 프로젝트
+│   ├── src/main/
+│   │   ├── java/
+│   │   └── resources/            # Schema, data 등 sql파일 포함
 │   └── …
-├── db/                   # DB 스키마 및 초기 데이터
-│   ├── crawler/          # 데이터 수집용 파이썬 코드
+├── db/                           # DB 스키마 및 초기 데이터
+│   ├── crawler/                  # 데이터 수집용 파이썬 코드
 │   │   ├── restaurant.py
-│   │   ├── menu.py
 │   │   └── …
-│   ├── schema.sql
 │   └── …
-└── README.md             # 프로젝트 설명 파일
+└── README.md                     # 프로젝트 설명 파일
 ```
 
 ## 백엔드 실행 방법
 
-아래 단계만 따라 하면 백엔드 서버를 바로 실행할 수 있습니다. 모든 명령은 프로젝트 루트 폴더의 `Spring/FFS` 디렉터리에서 실행하세요.
+아래 단계만 따라 하면 백엔드 서버를 바로 실행할 수 있습니다. 모든 명령은 프로젝트 루트 폴더의 `backend/FFS` 디렉터리에서 실행하세요.
+
+  ### 백엔드 서버 배포 (AWS EC2)
+
+  본 프로젝트는 `AWS EC2`에서 Spring Boot 백엔드를 원격 서버로 배포했습니다.
 
 ---
 
-### 1. MariaDB 설치 및 데이터베이스 생성
 
-1. **MariaDB 설치**
+### 1. EC2 인스턴스 생성
 
-   - **macOS (Homebrew)**
-     ```bash
-     brew update
-     brew install mariadb
-     ```
-   - **Windows**
-     1. <https://mariadb.org/download/> 에서 MSI 인스톨러 다운로드
-     2. 설치 중 ‘Add MariaDB to PATH’ 옵션 선택
-     3. 서비스(Services)에서 “MariaDB” 자동 시작으로 설정
+- EC2 인스턴스 생성 및 기본 설정 방법은 아래 공식 가이드를 참고하세요.
 
-2. **MariaDB 서비스 시작**
+  🔗 [AWS EC2 시작하기 가이드](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
 
-   - macOS:
-     ```bash
-     brew services start mariadb
-     ```
-   - Windows:
-     - 시작 → Services → “MariaDB” 우클릭 → Start
+### 2. 서버 내 환경 설정 및 실행
+- Java, MariaDB 설치(jdk 17 권장)
+  ```bash
+  sudo apt update
+  sudo apt install openjdk-17-jdk
+  sudo apt install mariadb-server
+  ```
 
-3. **MariaDB 클라이언트 접속**
+- 권한 설정 및 데이터베이스 준비
+  ```bash
+  sudo mariadb
 
-   ```bash
-   mysql -u root -p
-   ```
+  CREATE USER 'ffs_user'@'localhost' IDENTIFIED BY '0000';
+  GRANT ALL PRIVILEGES ON FFS.* TO 'ffs_user'@'localhost';
+  FLUSH PRIVILEGES;
 
-   > 설치 시 설정한 `root` 비밀번호 입력
+  CREATE DATABASE FFS CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  ```
 
-4. **데이터베이스 및 사용자 생성**
+- 스프링 프로젝트 clone 및 프로젝트 빌드
+  ```bash
+  git clone https://github.com/사용자명/ForkFineSejong.git
+  cd ForkFineSejong/Spring/FFS
+  ./mvnw clean package
+  chmod +x mvnw                 # 실행 권한 부여(Permission denied 오류 시)
+  ```
 
-   ```sql
-   -- 1) 애플리케이션용 데이터베이스 생성
-   CREATE DATABASE ffs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+- 백엔드 서버(프로젝트) 실행
 
-   -- 2) 전용 사용자 생성 및 비밀번호 설정
-   CREATE USER 'ffs_user'@'localhost' IDENTIFIED BY 'secure_password';
+  ```bash
+  ./mvnw spring-boot:run
+  ```
 
-   -- 3) 권한 부여 및 변경사항 반영
-   GRANT ALL PRIVILEGES ON ffs.* TO 'ffs_user'@'localhost';
-   FLUSH PRIVILEGES;
+### ⚠️ 서버 실행 전 확인 사항
 
-   EXIT;
-   ```
-
-5. **데이터베이스 데이터 적재**
-
-   restaurant.sql 파일 참고
-
-```sql
-CREATE TABLE IF NOT EXISTS restaurant (
-  id INT PRIMARY KEY AUTO_INCREMENT,                      -- 음식점 고유 ID (자동 증가)
-  name VARCHAR(100) NOT NULL,                             -- 음식점 이름
-  category VARCHAR(50) NOT NULL,                          -- 음식점 카테고리 (예: 한식, 중식, 양식 등)
-  description TEXT,                                       -- 음식점 설명 (필요 시 사용)
-  address VARCHAR(255) NOT NULL,                          -- 도로명 주소 또는 지번 주소
-  phone VARCHAR(30) NOT NULL,                             -- 전화번호
-  open_time VARCHAR(100) NOT NULL,                        -- 영업시간 (예: 11:00~21:30)
-  main_image_url VARCHAR(255),                            -- 대표 이미지 URL (없으면 NULL)
-  kakao_id VARCHAR(50) NOT NULL UNIQUE,                   -- Kakao 고유 장소 ID (중복 방지 키)
-  rating DECIMAL(2,1) DEFAULT 0.0,                        -- 평균 별점 정보 (예: 3.5)
-  location_tag ENUM('정문', '후문', '기타') DEFAULT '기타', -- 음식점 위치 태그 (정문/후문/기타)
-  is_new BOOLEAN DEFAULT FALSE                            -- 신규 개장 여부 (TRUE/FALSE)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
-```
-
-```sql
-CREATE TABLE IF NOT EXISTS menu (
-id INT PRIMARY KEY AUTO_INCREMENT,              -- 메뉴 고유 ID (자동 증가)
-restaurant_id INT NOT NULL,                     -- 참조할 음식점 ID (FK)
-name VARCHAR(100) NOT NULL,                     -- 메뉴 이름
-price INT NOT NULL,                              -- 가격 (원 단위)
-description TEXT,                                -- 메뉴 설명 (옵션)
-image_url VARCHAR(255),                          -- 메뉴 이미지 URL (옵션)
-FOREIGN KEY (restaurant_id)
- REFERENCES restaurant(id)
- ON DELETE CASCADE                              -- 음식점 삭제 시 해당 메뉴도 함께 삭제
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-```
-
-```sql
-CREATE TABLE IF NOT EXISTS review (
-id INT PRIMARY KEY AUTO_INCREMENT,                -- 리뷰 고유 ID (자동 증가)
-restaurant_id INT NOT NULL,                       -- 참조할 음식점 ID (FK)
-rating DECIMAL(2,1) DEFAULT 0.0,                  -- 별점 (1.0 ~ 5.0), 소수 첫째 자리까지
-comment TEXT NOT NULL,                            -- 리뷰 내용
-created_at DATE NOT NULL,                         -- 리뷰 작성일 (YYYY-MM-DD)
-FOREIGN KEY (restaurant_id)
- REFERENCES restaurant(id)
- ON DELETE CASCADE,                              -- 음식점 삭제 시 리뷰도 함께 삭제
-UNIQUE KEY uk_review (restaurant_id, comment, created_at)
- -- 같은 음식점에 동일한 날짜, 동일한 내용(comment)이 중복 저장되는 것을 방지
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-```
-
----
-
-### 2. `application.yml` (또는 `application.properties`) 설정
-
-설정 파일: `Spring/FFS/src/main/resources/application.yml`
-
-```yaml
-spring:
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/ffs?useSSL=false&serverTimezone=UTC
-    username: ffs_user # 위에서 생성한 사용자
-    password: secure_password
-
-  jpa:
-    hibernate:
-      ddl-auto: update # 개발: update, 운영: validate 또는 none
-    show-sql: true # SQL 로그 출력
-
-server:
-  port: 8080 # 기본 포트
-```
-
-> **properties 방식**
->
-> ```properties
-> spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
-> spring.datasource.url=jdbc:mariadb://localhost:3306/ffs?useSSL=false&serverTimezone=UTC
-> spring.datasource.username=ffs_user
-> spring.datasource.password=secure_password
->
-> spring.jpa.hibernate.ddl-auto=update
-> spring.jpa.show-sql=true
-> server.port=8080
-> ```
-
----
-
-### 3. Spring Boot 애플리케이션 실행
-
-1. **프로젝트 루트 이동**
-
-   ```bash
-   cd Spring/FFS
-   ```
-
-2. **의존성 설치 및 빌드**
-
-   ```bash
-   # macOS/Linux
-   ./mvnw clean package
-
-   # Windows (PowerShell)
-   .\mvnw.cmd clean package
-   ```
-
-3. **개발 모드 실행**
-
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-   - Spring DevTools가 있으면 코드 변경 시 자동 리로딩
-
-4. **JAR 파일로 실행**
-
-   ```bash
-   java -jar target/ffs-0.0.1-SNAPSHOT.jar
-   ```
-
-5. **실행 확인**
-   - 콘솔에 `Started FfsApplication` 메시지 출력
-   - 브라우저 또는 Postman에서 `http://localhost:8080/health` (또는 구현된 엔드포인트) 호출
-   - MariaDB에 테이블이 생성되었는지 확인:
-     ```bash
-     mysql -u ffs_user -p ffs -e "SHOW TABLES;"
-     ```
+- 백엔드(Spring Boot)는 외부 DB와 연결되므로, **EC2 인스턴스가 반드시 실행 중이어야 합니다.**
+- EC2 인스턴스가 꺼져 있으면 접속해도 연결되지 않습니다.
+- 프론트엔드와 연동 시에도 EC2 인스턴스 상태를 반드시 확인하세요.
 
 ---
 
