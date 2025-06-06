@@ -1,14 +1,10 @@
 // src/api/axiosInstance.js
-
 import axios from "axios";
 
-// 로컬이 아니라 항상 이 주소를 사용하도록 하드코딩
-const baseURL = "http://3.35.234.131:8080";
-
+// 절대 주소가 아니라, 상대경로만 설정
+// 실제 배포 환경에선 Vercel이 /api/** 를 rewrite 해서 뒤에서 HTTP 백엔드로 포워딩해준다.
 const api = axios.create({
-  baseURL,
-  // 필요한 헤더가 있으면 여기 추가
-  // headers: { "Content-Type": "application/json" },
+  baseURL: "/api", // ← 절대 URL이 아니라 "/api" 만 가리키면 됨
 });
 
 export default api;
